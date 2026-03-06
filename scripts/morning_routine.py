@@ -31,12 +31,34 @@ def main():
         
         # 获取自选股
         watchlist = WatchlistMemory()
-        codes = watchlist.get_codes()
+        items = watchlist.get_all()
         
-        if codes:
+        # 优先显示特别关注
+        focus_items = [i for i in items if '特别关注' in i.category]
+        focus_items.sort(key=lambda x: x.priority, reverse=True)
+        
+        if focus_items:
+            print(f"\n【⭐ 特别关注 - AI算力板块】")
+            focus_codes = [i.code for i in focus_items]
+            stock_data = data_fetcher.get_stock_data(focus_codes)
+            
+            for item in focus_items[:6]:
+                if item.code in stock_data:
+                    data = stock_data[item.code]
+                    emoji = "🟢" if data['change_pct'] >= 0 else "🔴"
+                    print(f"  {emoji} {data['name']}({item.code}): {data['current']:.2f} ({data['change_pct']:+.2f}%)")
+                    if item.notes:
+                        # 提取买入建议
+                        if '买入价' in item.notes or '等待' in item.notes:
+                            print(f"     💡 {item.notes.split('综合')[1] if '综合' in item.notes else item.notes}")
+        
+        # 其他自选股
+        other_items = [i for i in items if '特别关注' not in i.category]
+        if other_items:
             print(f"\n【自选股关注】")
-            stock_data = data_fetcher.get_stock_data(codes[:10])
-            for code in codes[:10]:
+            other_codes = [i.code for i in other_items[:5]]
+            stock_data = data_fetcher.get_stock_data(other_codes)
+            for code in other_codes:
                 if code in stock_data:
                     data = stock_data[code]
                     emoji = "🟢" if data['change_pct'] >= 0 else "🔴"

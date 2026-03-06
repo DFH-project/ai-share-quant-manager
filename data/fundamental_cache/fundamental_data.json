@@ -656,5 +656,191 @@
       "industry": "航空装备"
     },
     "timestamp": "2026-03-06T14:30:12.327728"
+  },
+  "301252": {
+    "data": {
+      "name": "同星科技",
+      "current": 37.28,
+      "change_pct": -0.21,
+      "volume": 40437.0,
+      "volume_ratio": 1,
+      "high_20d": 0,
+      "low_20d": 0,
+      "main_force_flow": 0,
+      "data_source": "腾讯/东财实时数据"
+    },
+    "timestamp": "2026-03-06T19:35:02.574189"
+  },
+  "002236": {
+    "data": {
+      "name": "大华股份",
+      "current": 18.17,
+      "change_pct": 0.11,
+      "volume": 214868.0,
+      "volume_ratio": 1,
+      "high_20d": 0,
+      "low_20d": 0,
+      "main_force_flow": 0,
+      "data_source": "腾讯/东财实时数据"
+    },
+    "timestamp": "2026-03-06T19:35:02.661518"
+  },
+  "688041": {
+    "data": {
+      "name": "海光信息",
+      "current": 241.9,
+      "change_pct": -0.45,
+      "volume": 14518915.0,
+      "volume_ratio": 1,
+      "high_20d": 0,
+      "low_20d": 0,
+      "main_force_flow": 0,
+      "data_source": "腾讯/东财实时数据"
+    },
+    "timestamp": "2026-03-06T19:35:02.791943"
+  },
+  "688008": {
+    "data": {
+      "name": "澜起科技",
+      "current": 151.61,
+      "change_pct": -0.67,
+      "volume": 21090811.0,
+      "volume_ratio": 1,
+      "high_20d": 0,
+      "low_20d": 0,
+      "main_force_flow": 0,
+      "data_source": "腾讯/东财实时数据"
+    },
+    "timestamp": "2026-03-06T19:35:02.880626"
+  },
+  "300499": {
+    "data": {
+      "name": "高澜股份",
+      "current": 37.8,
+      "change_pct": -2.22,
+      "volume": 502093.0,
+      "volume_ratio": 1,
+      "high_20d": 0,
+      "low_20d": 0,
+      "main_force_flow": 0,
+      "data_source": "腾讯/东财实时数据"
+    },
+    "timestamp": "2026-03-06T19:35:02.968086"
+  },
+  "000977": {
+    "data": {
+      "name": "浪潮信息",
+      "current": 59.43,
+      "change_pct": 0.17,
+      "volume": 248807.0,
+      "volume_ratio": 1,
+      "high_20d": 0,
+      "low_20d": 0,
+      "main_force_flow": 0,
+      "data_source": "腾讯/东财实时数据",
+      "pe": 48.25,
+      "pb": 5.85,
+      "roe": 12.25,
+      "industry": "计算机设备"
+    },
+    "timestamp": "2026-03-06T19:35:03.062416"
+  },
+  "688256": {
+    "data": {
+      "name": "寒武纪-U",
+      "current": 1154.88,
+      "change_pct": -1.12,
+      "volume": 4523467.0,
+      "volume_ratio": 1,
+      "high_20d": 0,
+      "low_20d": 0,
+      "main_force_flow": 0,
+      "data_source": "腾讯/东财实时数据"
+    },
+    "timestamp": "2026-03-06T19:35:03.193711"
+  },
+  "600845": {
+    "data": {
+      "name": "宝信软件",
+      "current": 23.1,
+      "change_pct": 2.12,
+      "volume": 178783.0,
+      "volume_ratio": 1,
+      "high_20d": 0,
+      "low_20d": 0,
+      "main_force_flow": 0,
+      "data_source": "腾讯/东财实时数据"
+    },
+    "timestamp": "2026-03-06T19:35:03.367880"
+  },
+  "300017": {
+    "data": {
+      "name": "网宿科技",
+      "current": 17.85,
+      "change_pct": -0.28,
+      "volume": 2096622.0,
+      "volume_ratio": 1,
+      "high_20d": 0,
+      "low_20d": 0,
+      "main_force_flow": 0,
+      "data_source": "腾讯/东财实时数据"
+    },
+    "timestamp": "2026-03-06T19:35:03.499658"
+  },
+  "300383": {
+    "data": {
+      "name": "光环新网",
+      "current": 14.88,
+      "change_pct": -1.13,
+      "volume": 881059.0,
+      "volume_ratio": 1,
+      "high_20d": 0,
+      "low_20d": 0,
+      "main_force_flow": 0,
+      "data_source": "腾讯/东财实时数据"
+    },
+    "timestamp": "2026-03-06T19:35:03.588007"
+  },
+  "002335": {
+    "data": {
+      "name": "科华数据",
+      "current": 60.7,
+      "change_pct": 4.87,
+      "volume": 375992.0,
+      "volume_ratio": 1,
+      "high_20d": 0,
+      "low_20d": 0,
+      "main_force_flow": 0,
+      "data_source": "腾讯/东财实时数据"
+    },
+    "timestamp": "2026-03-06T19:35:03.686548"
+  },
+  "002837": {
+    "data": {
+      "name": "英维克",
+      "current": 101.3,
+      "change_pct": -0.78,
+      "volume": 239704.0,
+      "volume_ratio": 1,
+      "high_20d": 0,
+      "low_20d": 0,
+      "main_force_flow": 0,
+      "data_source": "腾讯/东财实时数据"
+    },
+    "timestamp": "2026-03-06T19:35:03.820973"
+  },
+  "600804": {
+    "data": {
+      "name": "退市鹏博",
+      "current": 0.14,
+      "change_pct": 0.0,
+      "volume": 0.0,
+      "volume_ratio": 1,
+      "high_20d": 0,
+      "low_20d": 0,
+      "main_force_flow": 0,
+      "data_source": "腾讯/东财实时数据"
+    },
+    "timestamp": "2026-03-06T19:35:03.910676"
   }
 }
