@@ -512,5 +512,113 @@
       "industry": "光伏设备"
     },
     "timestamp": "2026-03-06T13:09:08.682832"
+  },
+  "002747": {
+    "data": {
+      "name": "埃斯顿",
+      "current": 22.24,
+      "change_pct": 1.14,
+      "volume": 93392.0,
+      "volume_ratio": 1,
+      "high_20d": 0,
+      "low_20d": 0,
+      "main_force_flow": 0,
+      "data_source": "腾讯/东财实时数据",
+      "pe": 38.25,
+      "pb": 3.55,
+      "roe": 11.25,
+      "industry": "自动化设备"
+    },
+    "timestamp": "2026-03-06T13:30:11.465289"
+  },
+  "600196": {
+    "data": {
+      "name": "复星医药",
+      "current": 25.74,
+      "change_pct": 2.02,
+      "volume": 98945.0,
+      "volume_ratio": 1,
+      "high_20d": 0,
+      "low_20d": 0,
+      "main_force_flow": 0,
+      "data_source": "腾讯/东财实时数据",
+      "pe": 18.25,
+      "pb": 2.85,
+      "roe": 12.85,
+      "industry": "生物制品"
+    },
+    "timestamp": "2026-03-06T13:30:11.855822"
+  },
+  "000988": {
+    "data": {
+      "name": "华工科技",
+      "current": 114.57,
+      "change_pct": 7.47,
+      "volume": 1018558.0,
+      "volume_ratio": 1,
+      "high_20d": 0,
+      "low_20d": 0,
+      "main_force_flow": 0,
+      "data_source": "腾讯/东财实时数据",
+      "pe": 38.25,
+      "pb": 3.85,
+      "roe": 12.25,
+      "industry": "通信设备"
+    },
+    "timestamp": "2026-03-06T13:30:12.029073"
+  },
+  "002074": {
+    "data": {
+      "name": "国轩高科",
+      "current": 36.28,
+      "change_pct": -0.55,
+      "volume": 168616.0,
+      "volume_ratio": 1,
+      "high_20d": 0,
+      "low_20d": 0,
+      "main_force_flow": 0,
+      "data_source": "腾讯/东财实时数据",
+      "pe": 25.35,
+      "pb": 2.95,
+      "roe": 15.25,
+      "industry": "电池"
+    },
+    "timestamp": "2026-03-06T13:30:12.296186"
+  },
+  "000538": {
+    "data": {
+      "name": "云南白药",
+      "current": 56.05,
+      "change_pct": 0.29,
+      "volume": 32067.0,
+      "volume_ratio": 1,
+      "high_20d": 0,
+      "low_20d": 0,
+      "main_force_flow": 0,
+      "data_source": "腾讯/东财实时数据",
+      "pe": 22.35,
+      "pb": 4.25,
+      "roe": 15.85,
+      "industry": "中药"
+    },
+    "timestamp": "2026-03-06T13:30:12.685861"
+  },
+  "688169": {
+    "data": {
+      "name": "石头科技",
+      "current": 133.97,
+      "change_pct": 0.11,
+      "volume": 1461227.0,
+      "volume_ratio": 1,
+      "high_20d": 0,
+      "low_20d": 0,
+      "main_force_flow": 0,
+      "data_source": "腾讯/东财实时数据",
+      "pe": 42.15,
+      "pb": 5.85,
+      "roe": 14.25,
+      "industry": "消费电子"
+    },
+    "timestamp": "2026-03-06T13:30:12.773305"
   }
 }
