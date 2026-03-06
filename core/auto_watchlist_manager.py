@@ -349,15 +349,29 @@ class AutoWatchlistManager:
             '追涨型': '重点监控-追涨',
             '潜力型': '重点监控-潜力',
             '抄底型': '重点监控-抄底',
-            '多维度优选': '重点监控-优选'
+            '多维度优选': '重点监控-优选',
+            '震荡整理': '重点监控-震荡',
+            '板块补涨': '重点监控-补涨',
+            '基本面价值': '重点监控-价值',
+            '重点-AI算力': '重点监控-AI算力',
+            '重点-半导体': '重点监控-半导体',
+            '重点-新能源': '重点监控-新能源',
+            '重点-机器人': '重点监控-机器人'
         }
         
         priority_map = {
-            '强势股低吸': 10,  # 最高优先级
+            '强势股低吸': 10,
             '追涨型': 9,
             '潜力型': 8,
             '抄底型': 7,
-            '多维度优选': 9  # 高优先级，与追涨同级
+            '多维度优选': 9,
+            '震荡整理': 8,  # 新策略优先级
+            '板块补涨': 9,  # 新策略优先级
+            '基本面价值': 7,  # 新策略优先级
+            '重点-AI算力': 9,
+            '重点-半导体': 9,
+            '重点-新能源': 9,
+            '重点-机器人': 9
         }
         
         emoji_map = {
@@ -365,7 +379,14 @@ class AutoWatchlistManager:
             '追涨型': '🚀',
             '潜力型': '💎',
             '抄底型': '🎯',
-            '多维度优选': '⭐'
+            '多维度优选': '⭐',
+            '震荡整理': '⏳',  # 新策略emoji
+            '板块补涨': '📈',  # 新策略emoji
+            '基本面价值': '💰',  # 新策略emoji
+            '重点-AI算力': '🤖',
+            '重点-半导体': '🔌',
+            '重点-新能源': '🔋',
+            '重点-机器人': '🦾'
         }
         
         category = category_map.get(strategy_type, '重点监控')
@@ -550,7 +571,7 @@ class AutoWatchlistManager:
         bottom_added = self.auto_add_to_watchlist(bottom_signals, '抄底型')
         print(f"  发现 {len(bottom_signals)} 个抄底机会，新增 {bottom_added} 只")
         
-        # 4. 多维度综合选股（新增核心策略）
+        # 4. 多维度综合选股
         print("\n【策略4: 多维度综合优选 - 趋势+基本面+资金+技术+板块】")
         multi_signals = self.scan_multi_dimension_opportunities()
         multi_added = self.auto_add_to_watchlist(multi_signals, '多维度优选')
@@ -560,7 +581,57 @@ class AutoWatchlistManager:
             for s in multi_signals[:3]:
                 print(f"    ⭐ {s['name']}({s['code']}) 综合{s['score']:.0f}分 - {s['suggestion']}")
         
-        # 5. 清理走坏的股票
+        # 5. 震荡股票池（新增）
+        print("\n【策略5: 震荡整理 - 评分60-64分，今日涨幅-1%~+1%】")
+        print("   核心逻辑：震荡整理中，等待突破信号")
+        consolidation_signals = self.scan_consolidation_stocks()
+        consolidation_added = self.auto_add_to_watchlist(consolidation_signals, '震荡整理')
+        print(f"  发现 {len(consolidation_signals)} 只震荡整理标的，新增 {consolidation_added} 只")
+        if consolidation_signals:
+            print("  震荡整理标的：")
+            for s in consolidation_signals[:3]:
+                print(f"    ⏳ {s['name']}({s['code']}) {s['change_pct']:+.2f}% 综合{s['score']:.0f}分")
+        
+        # 6. 板块补涨机会（新增）
+        print("\n【策略6: 板块补涨 - 板块涨但个股没涨】")
+        print("   核心逻辑：板块效应扩散，滞涨个股补涨")
+        laggard_signals = self.scan_sector_laggards()
+        laggard_added = self.auto_add_to_watchlist(laggard_signals, '板块补涨')
+        print(f"  发现 {len(laggard_signals)} 个补涨机会，新增 {laggard_added} 只")
+        if laggard_signals:
+            print("  补涨标的：")
+            for s in laggard_signals[:3]:
+                print(f"    📈 {s['name']}({s['code']}) 板块{s['sector_change']:+.2f}% 个股{s['change_pct']:+.2f}%")
+        
+        # 7. 基本面价值筛选（新增）
+        print("\n【策略7: 基本面价值 - PE<20 + ROE>15%，不管今日涨跌】")
+        print("   核心逻辑：低估值+高盈利，价值投资视角")
+        value_signals = self.scan_fundamental_value()
+        value_added = self.auto_add_to_watchlist(value_signals, '基本面价值')
+        print(f"  发现 {len(value_signals)} 只价值标的，新增 {value_added} 只")
+        if value_signals:
+            print("  价值标的：")
+            for s in value_signals[:3]:
+                print(f"    💰 {s['name']}({s['code']}) PE{s['pe']:.1f} ROE{s['roe']:.1f}%")
+        
+        # 8. 重点板块标的筛选（新增）
+        print("\n【策略8: 重点板块 - AI算力/半导体/新能源/机器人】")
+        focus_signals = self.scan_focus_sectors(['AI算力', '半导体', '新能源', '机器人'])
+        focus_added = 0
+        for s in focus_signals:
+            added = self.auto_add_to_watchlist([s], s['strategy'])
+            focus_added += added
+        print(f"  发现 {len(focus_signals)} 只重点板块标的，新增 {focus_added} 只")
+        if focus_signals:
+            print("  重点板块标的：")
+            current_sector = ""
+            for s in focus_signals[:6]:
+                if s['sector'] != current_sector:
+                    current_sector = s['sector']
+                    print(f"    【{current_sector}】")
+                print(f"      {s['name']}({s['code']}) 综合{s['score']:.0f}分")
+        
+        # 9. 清理走坏的股票
         removed = self.auto_remove_from_watchlist()
         print(f"\n  降级 {removed} 只走坏的股票")
         
@@ -572,16 +643,259 @@ class AutoWatchlistManager:
             'potential': {'found': len(potential_signals), 'added': potential_added, 'signals': potential_signals[:3]},
             'bottom': {'found': len(bottom_signals), 'added': bottom_added, 'signals': bottom_signals[:3]},
             'multi': {'found': len(multi_signals), 'added': multi_added, 'signals': multi_signals[:3]},
+            'consolidation': {'found': len(consolidation_signals), 'added': consolidation_added, 'signals': consolidation_signals[:3]},
+            'laggard': {'found': len(laggard_signals), 'added': laggard_added, 'signals': laggard_signals[:3]},
+            'value': {'found': len(value_signals), 'added': value_added, 'signals': value_signals[:3]},
+            'focus': {'found': len(focus_signals), 'added': focus_added, 'signals': focus_signals[:6]},
             'removed': removed
         }
     
-    def _get_default_scan_pool(self) -> List[str]:
-        """获取默认扫描池"""
-        pool = set(self.watchlist.get_codes())
-        # 加入热门板块核心标的
-        for codes in HOT_SECTOR_CORE.values():
-            pool.update(codes)
-        return list(pool)
+    def scan_consolidation_stocks(self) -> List[Dict]:
+        """
+        新增策略6: 震荡股票池 - 评分60-64分，今日涨幅-1%~+1%
+        特征：
+        1. 综合评分60-64分（中等偏上，但未达到优选标准）
+        2. 今日涨幅-1%~+1%（震荡整理，未启动）
+        3. 基本面尚可（PE<30或ROE>10%）
+        4. 等待突破信号（震荡后可能向上突破）
+        """
+        consolidation = []
+        
+        try:
+            # 扫描热门板块核心标的
+            scan_pool = []
+            for codes in HOT_SECTOR_CORE.values():
+                scan_pool.extend(codes)
+            scan_pool = list(set(scan_pool))
+            
+            stock_data = data_fetcher.get_stock_data(scan_pool[:40])
+            analyzer = get_analyzer()
+            
+            for code in scan_pool[:40]:
+                if code not in stock_data:
+                    continue
+                
+                data = stock_data[code]
+                change_pct = data.get('change_pct', 0)
+                
+                # 条件1: 今日震荡（-1%~+1%）
+                if -1 <= change_pct <= 1:
+                    # 多维度分析
+                    result = analyzer.analyze_stock(code)
+                    if result and 60 <= result.total_score < 65:
+                        consolidation.append({
+                            'code': result.code,
+                            'name': result.name,
+                            'price': result.current_price,
+                            'change_pct': change_pct,
+                            'score': result.total_score,
+                            'trend_score': result.trend_score,
+                            'fundamental_score': result.fundamental_score,
+                            'reasons': [
+                                f"震荡整理{change_pct:+.2f}%",
+                                f"综合{result.total_score:.0f}分",
+                                f"趋势{result.trend_score:.0f}",
+                                "等待突破"
+                            ],
+                            'strategy': '震荡整理',
+                            'time': datetime.now().strftime('%H:%M')
+                        })
+            
+            consolidation.sort(key=lambda x: x['score'], reverse=True)
+            
+        except Exception as e:
+            print(f"扫描震荡股票失败: {e}")
+        
+        return consolidation[:10]
+    
+    def scan_sector_laggards(self) -> List[Dict]:
+        """
+        新增策略7: 板块补涨机会 - 板块涨但个股没涨
+        特征：
+        1. 所属板块今日涨幅>1.5%（板块强势）
+        2. 个股今日涨幅<0.5%（滞涨）
+        3. 个股属于板块核心标的
+        4. 有补涨潜力（板块效应会扩散）
+        """
+        laggards = []
+        
+        try:
+            # 先计算各板块平均涨幅
+            sector_performance = {}
+            sector_stocks = {}
+            
+            for sector, codes in HOT_SECTOR_CORE.items():
+                stock_data = data_fetcher.get_stock_data(codes)
+                total_change = 0
+                count = 0
+                stocks_info = []
+                
+                for code in codes:
+                    if code in stock_data:
+                        change = stock_data[code].get('change_pct', 0)
+                        total_change += change
+                        count += 1
+                        stocks_info.append({
+                            'code': code,
+                            'name': stock_data[code].get('name', code),
+                            'price': stock_data[code].get('current', 0),
+                            'change_pct': change
+                        })
+                
+                if count > 0:
+                    sector_performance[sector] = total_change / count
+                    sector_stocks[sector] = stocks_info
+            
+            # 找出强势板块中的滞涨个股
+            for sector, avg_change in sector_performance.items():
+                if avg_change > 1.5:  # 板块强势
+                    for stock in sector_stocks[sector]:
+                        if stock['change_pct'] < 0.5:  # 个股滞涨
+                            laggards.append({
+                                'code': stock['code'],
+                                'name': stock['name'],
+                                'price': stock['price'],
+                                'change_pct': stock['change_pct'],
+                                'sector_change': avg_change,
+                                'sector': sector,
+                                'score': int(50 + (avg_change - stock['change_pct']) * 10),
+                                'reasons': [
+                                    f"板块{avg_change:+.2f}%",
+                                    f"个股{stock['change_pct']:+.2f}%",
+                                    "补涨潜力",
+                                    sector
+                                ],
+                                'strategy': '板块补涨',
+                                'time': datetime.now().strftime('%H:%M')
+                            })
+            
+            laggards.sort(key=lambda x: x['score'], reverse=True)
+            
+        except Exception as e:
+            print(f"扫描补涨机会失败: {e}")
+        
+        return laggards[:10]
+    
+    def scan_fundamental_value(self) -> List[Dict]:
+        """
+        新增策略8: 基本面价值筛选 - PE<20 + ROE>15%，不管今日涨跌
+        特征：
+        1. PE<20（低估值）
+        2. ROE>15%（优秀盈利能力）
+        3. 不关注今日涨跌（价值投资视角）
+        4. 适合中长期持有
+        """
+        value_stocks = []
+        
+        try:
+            # 扫描热门板块中的价值股
+            scan_pool = []
+            for codes in HOT_SECTOR_CORE.values():
+                scan_pool.extend(codes)
+            scan_pool = list(set(scan_pool))
+            
+            stock_data = data_fetcher.get_stock_data(scan_pool[:40])
+            analyzer = get_analyzer()
+            
+            for code in scan_pool[:40]:
+                if code not in stock_data:
+                    continue
+                
+                data = stock_data[code]
+                change_pct = data.get('change_pct', 0)
+                
+                # 多维度分析获取基本面数据
+                result = analyzer.analyze_stock(code)
+                if result:
+                    # 从基本面服务获取详细数据
+                    from core.fundamental_service import get_fundamental_data
+                    fund_data = get_fundamental_data(code)
+                    
+                    if fund_data:
+                        pe = fund_data.get('pe', 999)
+                        roe = fund_data.get('roe', 0)
+                        
+                        # 条件: PE<20 且 ROE>15%
+                        if pe < 20 and roe > 15:
+                            score = int(60 + (20 - pe) * 2 + (roe - 15))
+                            value_stocks.append({
+                                'code': code,
+                                'name': result.name,
+                                'price': result.current_price,
+                                'change_pct': change_pct,
+                                'pe': pe,
+                                'roe': roe,
+                                'score': min(score, 90),
+                                'reasons': [
+                                    f"PE {pe:.1f}",
+                                    f"ROE {roe:.1f}%",
+                                    f"今日{change_pct:+.2f}%",
+                                    "低估值+高盈利"
+                                ],
+                                'strategy': '基本面价值',
+                                'time': datetime.now().strftime('%H:%M')
+                            })
+            
+            value_stocks.sort(key=lambda x: x['score'], reverse=True)
+            
+        except Exception as e:
+            print(f"扫描价值股失败: {e}")
+        
+        return value_stocks[:10]
+    
+    def scan_focus_sectors(self, focus_sectors: List[str] = None) -> List[Dict]:
+        """
+        新增策略9: 重点关注板块标的筛选
+        用户可以指定重点关注的板块，深度扫描其中的优质标的
+        
+        Args:
+            focus_sectors: 重点板块列表，如 ['AI算力', '半导体', '新能源']
+        """
+        if focus_sectors is None:
+            # 默认关注当前热点板块
+            focus_sectors = ['AI算力', '半导体', '新能源', '机器人']
+        
+        focus_stocks = []
+        
+        try:
+            analyzer = get_analyzer()
+            
+            for sector in focus_sectors:
+                if sector not in HOT_SECTOR_CORE:
+                    continue
+                
+                codes = HOT_SECTOR_CORE[sector]
+                sector_best = []
+                
+                for code in codes:
+                    result = analyzer.analyze_stock(code)
+                    if result and result.total_score >= 55:
+                        sector_best.append({
+                            'code': result.code,
+                            'name': result.name,
+                            'price': result.current_price,
+                            'change_pct': result.change_pct,
+                            'score': result.total_score,
+                            'sector': sector,
+                            'reasons': [
+                                f"重点板块-{sector}",
+                                f"综合{result.total_score:.0f}分",
+                                result.suggestion[:15]
+                            ],
+                            'strategy': f'重点-{sector}',
+                            'time': datetime.now().strftime('%H:%M')
+                        })
+                
+                # 每个板块取前3
+                sector_best.sort(key=lambda x: x['score'], reverse=True)
+                focus_stocks.extend(sector_best[:3])
+            
+            focus_stocks.sort(key=lambda x: x['score'], reverse=True)
+            
+        except Exception as e:
+            print(f"扫描重点板块失败: {e}")
+        
+        return focus_stocks[:15]
 
 
 # 单例
