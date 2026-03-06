@@ -1,5 +1,38 @@
 {
-  "watchlist": [],
-  "categories": ["default", "关注", "持仓", "观察", "自选"],
-  "updated_at": ""
+  "watchlist": [
+    {
+      "code": "603127",
+      "name": "昭衍新药",
+      "added_date": "2026-03-06",
+      "category": "板块龙头",
+      "notes": "🏆医药龙头 +4.04%",
+      "tags": [
+        "板块龙头",
+        "医药",
+        "领涨"
+      ],
+      "priority": 8
+    },
+    {
+      "code": "002714",
+      "name": "牧原股份",
+      "added_date": "2026-03-06",
+      "category": "板块龙头",
+      "notes": "🏆消费龙头 +5.15%",
+      "tags": [
+        "板块龙头",
+        "消费",
+        "领涨"
+      ],
+      "priority": 8
+    }
+  ],
+  "categories": [
+    "自选",
+    "default",
+    "关注",
+    "观察",
+    "持仓"
+  ],
+  "updated_at": "2026-03-06 12:00:36"
 }
