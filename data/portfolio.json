@@ -1,5 +1,5 @@
 {
-  "cash": 18012,
+  "cash": 12822,
   "positions": [
     {"code": "513180", "name": "恒生科技指数ETF", "quantity": 7000, "cost_price": 0.708},
     {"code": "600733", "name": "北汽蓝谷", "quantity": 200, "cost_price": 8.90},
@@ -8,6 +8,7 @@
     {"code": "002050", "name": "三花智控", "quantity": 200, "cost_price": 51.14},
     {"code": "600584", "name": "长电科技", "quantity": 100, "cost_price": 48.11},
     {"code": "002230", "name": "科大讯飞", "quantity": 100, "cost_price": 51.79},
-    {"code": "002085", "name": "万丰奥威", "quantity": 100, "cost_price": 16.76}
+    {"code": "002085", "name": "万丰奥威", "quantity": 100, "cost_price": 16.76},
+    {"code": "601138", "name": "工业富联", "quantity": 100, "cost_price": 51.90}
   ]
 }
