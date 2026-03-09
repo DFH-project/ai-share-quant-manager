@@ -1,132 +1,113 @@
-# A-Share Quant Manager
+# A-Share Quant Manager V3
 
-A股投资量化管理工具 - 自选股管理与智能交易系统
+## 系统架构
 
-## 项目结构
+### 核心模块
 
-```
-a-share-quant-manager/
-├── core/                       # 核心模块
-│   ├── __init__.py
-│   ├── watchlist_memory.py     # 自选股记忆模块
-│   ├── monthly_strategy.py     # 月度策略模块
-│   ├── smart_trader.py         # 智能交易模块
-│   └── data_fetcher_v2.py      # 数据获取模块V2
-├── config/                     # 配置文件
-│   ├── __init__.py
-│   └── settings.py
-├── utils/                      # 工具函数
-│   ├── __init__.py
-│   └── helpers.py
-├── tests/                      # 测试文件
-│   ├── __init__.py
-│   └── test_modules.py
-├── data/                       # 数据存储
-│   └── watchlist.json
-├── main.py                     # 主入口
-├── requirements.txt            # 依赖
-└── README.md                   # 项目说明
-```
+| 模块 | 文件 | 功能 |
+|:---|:---|:---|
+| **DataManager** | `core/data_manager.py` | 统一数据管理，多源并行获取，智能缓存 |
+| **HistoricalCache** | `core/historical_cache.py` | K线/均线/基本面历史数据缓存 |
+| **ParallelAnalyzer** | `core/parallel_analyzer.py` | 5只并发分析引擎 |
+| **IntegratedMonitor** | `scripts/integrated_monitor.py` | 持仓+自选联动监控 |
 
-## 功能模块
-
-### 1. watchlist_memory.py - 自选股记忆模块
-- 管理用户自选股列表
-- 持久化存储到本地JSON
-- 支持增删改查操作
-- 支持分类和标签管理
-
-### 2. monthly_strategy.py - 月度策略模块
-- 月度选股策略
-- 策略回测与评估
-- 生成月度交易信号
-- 技术指标分析（MA, RSI, MACD, 布林带）
-
-### 3. smart_trader.py - 智能交易模块
-- 交易执行与风控
-- 仓位管理
-- 交易记录追踪
-- 止损止盈检查
-
-### 4. data_fetcher_v2.py - 数据获取模块
-- A股实时数据获取（AKShare）
-- 历史数据下载
-- 数据清洗与缓存
-- 指数和板块数据
-
-## 模块联动关系
+### 数据流转
 
 ```
-┌─────────────────┐
-│  DataFetcherV2  │◄────── 真实数据源 (AKShare)
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐     ┌─────────────────┐
-│ WatchlistMemory │────►│ MonthlyStrategy │
-└────────┬────────┘     └────────┬────────┘
-         │                       │
-         │                       ▼
-         │              ┌─────────────────┐
-         └─────────────►│   SmartTrader   │
-                        └─────────────────┘
-```
-
-## 安装依赖
-
-```bash
-pip install -r requirements.txt
+DataManager (实时+历史数据)
+    ↓
+ParallelAnalyzer / PositionHealth / RebalanceEngine
+    ↓
+IntegratedMonitor (统一报告)
 ```
 
 ## 使用方法
 
-### 命令行交互模式
+### 1. 联动监控（推荐）
 ```bash
-python main.py
+python3 scripts/integrated_monitor.py
 ```
 
-### 作为库使用
+### 2. 单独查询
 ```python
-from core.data_fetcher_v2 import DataFetcherV2
-from core.watchlist_memory import WatchlistMemory
-from core.monthly_strategy import MonthlyStrategy
-from core.smart_trader import SmartTrader
-
-# 初始化模块
-fetcher = DataFetcherV2()
-watchlist = WatchlistMemory()
-strategy = MonthlyStrategy(fetcher)
-trader = SmartTrader(fetcher)
-
-# 添加自选股
-watchlist.add('000001', category='关注', data_fetcher=fetcher)
-
-# 运行策略扫描
-signals = strategy.scan_watchlist(watchlist)
-
-# 执行交易
-order_ids = trader.execute_strategy_signals(signals, watchlist)
+from core.data_manager import data_manager
+data = data_manager.fetch_stock_data(['600584', '300308'])
 ```
 
-## 数据说明
-
-本项目使用真实数据源：
-- **AKShare**: A股实时/历史数据（主要数据源）
-- 所有数据均为真实市场数据，禁止AI生成假数据
-
-## 测试
-
-运行模块测试：
-```bash
-python tests/test_modules.py
+### 3. 收盘后批量更新缓存
+```python
+from core.historical_cache import historical_cache
+historical_cache.batch_update_all(codes)
 ```
 
-或从主菜单选择选项9
+## 数据源配置
 
-## 更新日志
+| 数据源 | 优先级 | 用途 |
+|:---|:---:|:---|
+| 腾讯财经 | 1 | 实时价格、涨跌幅 |
+| 东方财富 | 2 | 技术指标、K线 |
+| 新浪财经 | 3 | 备用 |
+| AKShare | 4 | 备用 |
 
-### 2024-03-05
-- 完成Watchlist模块升级
-- 修复模块间数据流转问题
-- 统一接口命名规范
-- 添加单例模式支持
+## 缓存策略
+
+| 数据类型 | 内存缓存 | 文件缓存 |
+|:---|:---:|:---:|
+| 实时价格 | 1分钟 | 5分钟 |
+| 技术指标 | - | 30分钟 |
+| 基本面 | - | 1小时 |
+| K线数据 | - | 收盘后更新 |
+
+## 当前持仓（2026-03-09 13:48）
+
+| 股票 | 代码 | 成本 | 数量 | 状态 |
+|:---|:---:|:---:|:---:|:---|
+| 工业富联 | 601138 | 51.90 | 100 | 🟢 新买入 |
+| 万丰奥威 | 002085 | 16.76 | 100 | 🟢 持有 |
+| 科大讯飞 | 002230 | 51.79 | 100 | 🟢 持有 |
+| 长电科技 | 600584 | 48.11 | 100 | 🟠 等反弹减仓 |
+| 三花智控 | 002050 | 51.14 | 200 | 🟠 观察 |
+| 北汽蓝谷 | 600733 | 8.90 | 200 | 🔴 等反弹减仓 |
+| 浪潮软件 | 600756 | 18.50 | 100 | 🔴 等反弹减仓 |
+| 昭衍新药 | 603127 | 38.04 | 100 | 🔴 等反弹减仓 |
+| 恒生科技ETF | 513180 | 0.708 | 7000 | 🟡 持有 |
+
+**现金：** 12,822元
+
+## 特别关注板块
+
+### AI算力
+- 中科曙光(603019) ⭐ 新增
+- 浪潮信息(000977)
+- 华工科技(000988)
+- 宝信软件(600845)
+- 科华数据(002335)
+
+### CPO光模块
+- 中际旭创(300308)
+- 新易盛(300502)
+- 天孚通信(300394)
+
+## 今日操作记录
+
+| 时间 | 操作 | 股票 | 价格 | 数量 |
+|:---|:---|:---|:---:|:---:|
+| 13:22 | 买入 | 工业富联 | 51.90 | 100 |
+| 13:43 | 关注 | 中科曙光 | - | - |
+
+## 下午策略
+
+1. **持有**：富联、万丰奥威、科大讯飞
+2. **等反弹减仓**：长电、北汽蓝谷、浪潮软件、昭衍新药
+3. **不追**：中科曙光（已涨+1.89%）
+
+## 风险提示
+
+- 东财/新浪/AKShare网络不稳定，已用腾讯兜底
+- 历史缓存首次建立，部分数据缺失
+- 收盘后(15:30)运行批量更新补全数据
+
+---
+
+*系统版本: V3.0*
+*更新时间: 2026-03-09 13:48*
