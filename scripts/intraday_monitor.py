@@ -16,6 +16,7 @@ from core.data_fetcher import data_fetcher
 from core.watchlist_memory import WatchlistMemory
 from core.auto_watchlist_manager import get_auto_manager
 from core.sector_tracker import get_sector_tracker
+from core.smart_rebalance_advisor import SmartRebalanceAdvisor
 from datetime import datetime, time
 
 def load_portfolio():
@@ -86,7 +87,26 @@ def main():
             auto_manager = get_auto_manager()
             scan_results = auto_manager.run_full_scan()
         
-        # ===== 4. 获取数据 =====
+        # ===== 4. 智能调仓分析（每30分钟，全量扫描时）=====
+        rebalance_report = None
+        if should_run_full_scan() and positions:
+            print("\n" + "="*60)
+            print("🤖 智能调仓分析")
+            print("="*60)
+            try:
+                advisor = SmartRebalanceAdvisor()
+                analysis = advisor.generate_full_analysis()
+                rebalance_report = advisor.generate_comprehensive_report(analysis)
+                # 只显示核心建议
+                print(f"  已分析 {len(analysis['health_reports'])} 只持仓股")
+                print(f"  发现 {len(analysis['opportunities'])} 个换仓机会")
+                if analysis['recommendations']:
+                    print("\n  核心建议:")
+                    for rec in analysis['recommendations'][:3]:
+                        print(f"    • {rec['title']}")
+                        print(f"      建议: {rec['action'][:50]}")
+            except Exception as e:
+                print(f"  调仓分析跳过: {e}")
         portfolio = load_portfolio()
         positions = portfolio.get('positions', [])
         cash = portfolio.get('cash', 0)

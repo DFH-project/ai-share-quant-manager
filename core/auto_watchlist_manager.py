@@ -39,7 +39,30 @@ class AutoWatchlistManager:
         self.buy_signals = []  # 买入信号池
         self.potential_stocks = []  # 潜力股池
         self.bottom_fishing = []  # 抄底池
-        
+
+    def _get_default_scan_pool(self) -> List[str]:
+        """获取默认扫描股票池 - 热门板块核心标的"""
+        stock_pool = set()
+        # 从 HOT_SECTOR_CORE 收集所有板块的核心标的
+        for sector, codes in HOT_SECTOR_CORE.items():
+            stock_pool.update(codes)
+        # 加入当前持仓
+        portfolio_codes = self._get_portfolio_codes()
+        stock_pool.update(portfolio_codes)
+        return list(stock_pool)
+
+    def _get_portfolio_codes(self) -> List[str]:
+        """获取当前持仓股票代码"""
+        try:
+            portfolio_path = Path(__file__).parent.parent / 'data' / 'portfolio.json'
+            if portfolio_path.exists():
+                with open(portfolio_path, 'r') as f:
+                    portfolio = json.load(f)
+                    return [p['code'] for p in portfolio.get('positions', [])]
+        except Exception:
+            pass
+        return []
+
     def scan_dip_buy_opportunities(self) -> List[Dict]:
         """
         策略4: 强势股低吸型 - 关键策略
@@ -268,12 +291,14 @@ class AutoWatchlistManager:
     
     def scan_bottom_fishing(self, stock_pool: List[str] = None) -> List[Dict]:
         """
-        策略3: 抄底型 - 扫描调整后低位企稳的热门股
+        策略3: 抄底型 - 板块前景好+大跌低位+有支撑+均线趋势良好
         特征：
-        1. 属于热门板块
-        2. 近期调整充分（从高点回调>10%）
-        3. 出现企稳信号（缩量十字星、下影线）
-        4. 今日微涨或止跌（跌幅<2%）
+        1. 板块前景好（属于热门板块核心标的）
+        2. 大跌处于低位（从20日高点回调>8%，处于近期低位）
+        3. 低位有支撑（未跌破关键均线支撑，如30日线）
+        4. 均线趋势良好（30日、60日均线多头排列或走平）
+        5. 今日出现止跌信号（跌幅收窄、缩量、下影线）
+        逻辑：这个点买入，后续可持续向上
         """
         bottoms = []
         
@@ -287,49 +312,107 @@ class AutoWatchlistManager:
             stock_data = data_fetcher.get_stock_data(stock_pool[:40])
             
             for code, data in stock_data.items():
+                current = data.get('current', 0)
                 change_pct = data.get('change_pct', 0)
                 high_20d = data.get('high_20d', 0)
-                current = data.get('current', 0)
+                low_20d = data.get('low_20d', 0)
+                ma30 = data.get('ma30', 0)  # 30日均线
+                ma60 = data.get('ma60', 0)  # 60日均线
                 
-                # 条件1: 有前期高点且回调充分
-                if high_20d > 0 and current < high_20d * 0.90:  # 从20日高点回调>10%
-                    score = 0
-                    reasons = []
+                if high_20d <= 0 or current <= 0:
+                    continue
+                
+                # 计算从高点回调幅度
+                pullback_pct = (high_20d - current) / high_20d * 100
+                
+                score = 0
+                reasons = []
+                
+                # 条件1: 板块前景好（属于热门板块核心标的）- 放宽：非热门也给分
+                sector_name = self._get_stock_sector(code)
+                if sector_name:
+                    score += 25
+                    reasons.append(f"热门板块-{sector_name}")
+                else:
+                    score += 10  # 非热门板块也给基础分
+                    reasons.append("非热门板块")
+                
+                # 条件2: 大跌处于低位（从20日高点回调>=6%，放宽）
+                if pullback_pct >= 6:
+                    score += 20
+                    reasons.append(f"回调{pullback_pct:.1f}%")
                     
-                    # 止跌信号
-                    if -2 < change_pct < 2:  # 跌幅收窄或微涨
-                        score += 25
-                        reasons.append("止跌企稳")
-                    
-                    # 缩量（抛压减轻）
-                    if data.get('volume_ratio', 0) < 0.8:
-                        score += 20
-                        reasons.append("缩量惜售")
-                    
-                    # 下影线（支撑有效）
-                    if data.get('low', 0) > 0:
-                        lower_shadow = (current - data.get('low', current)) / data.get('low', 1) * 100
-                        if lower_shadow > 1:  # 有下影线
-                            score += 15
-                            reasons.append("下方支撑")
-                    
-                    # 热门板块属性
+                    # 是否接近近期低位
+                    if low_20d > 0:
+                        near_low_ratio = (current - low_20d) / (high_20d - low_20d)
+                        if near_low_ratio < 0.3:  # 处于近期低位区间
+                            score += 10
+                            reasons.append("处于低位区间")
+                else:
+                    continue  # 回调不够，不符合抄底条件
+                
+                # 条件3: 低位有支撑（放宽：只要在60日线上方即可）
+                if ma30 > 0:
+                    support_ratio = (current - ma30) / ma30 * 100
+                    if support_ratio > -5:  # 放宽：在30日均线上方5%内
+                        score += 15
+                        reasons.append("30日线支撑")
+                    elif support_ratio > -10:  # 放宽：跌破30日线但在10%内
+                        score += 8
+                        reasons.append("跌破30日线不多")
+                
+                # 条件4: 均线趋势（放宽：60日线支撑更重要）
+                if ma60 > 0:
+                    ma60_support = (current - ma60) / ma60 * 100
+                    if ma60_support > -5:  # 在60日线上方5%内
+                        score += 15
+                        reasons.append("60日线支撑")
+                    elif ma60_support > -10:  # 跌破60日线不多
+                        score += 5
+                        reasons.append("接近60日线")
+                
+                # 条件5: 今日出现止跌信号（放宽：允许今日还在跌，只要跌幅<5%）
+                # 5.1 跌幅温和（放宽：-5%到+2%都算）
+                if -5 < change_pct < 2:  # 放宽：跌幅<5%或微涨
                     score += 10
-                    reasons.append("热门板块调整")
-                    
-                    if score >= 40:
-                        pullback_pct = (high_20d - current) / high_20d * 100
-                        bottoms.append({
-                            'code': code,
-                            'name': data.get('name', code),
-                            'price': current,
-                            'change_pct': change_pct,
-                            'pullback_pct': pullback_pct,
-                            'score': score,
-                            'reasons': reasons,
-                            'strategy': '抄底型',
-                            'time': datetime.now().strftime('%H:%M')
-                        })
+                    reasons.append("跌幅温和")
+                elif -7 < change_pct <= -5:  # 跌幅较大但可控
+                    score += 5
+                    reasons.append("跌幅较大")
+                
+                # 5.2 缩量（抛压减轻）
+                volume_ratio = data.get('volume_ratio', 1)
+                if volume_ratio < 0.8:  # 明显缩量
+                    score += 8
+                    reasons.append("缩量惜售")
+                elif volume_ratio < 1.0:  # 轻微缩量
+                    score += 4
+                    reasons.append("量能缩减")
+                
+                # 5.3 下影线（盘中反弹，有支撑）
+                if data.get('low', 0) > 0:
+                    lower_shadow = (current - data['low']) / data['low'] * 100
+                    if lower_shadow > 1.5:  # 有明显下影线
+                        score += 7
+                        reasons.append("下影线支撑")
+                
+                # 总分达标才加入（放宽到50分）
+                if score >= 50:
+                    bottoms.append({
+                        'code': code,
+                        'name': data.get('name', code),
+                        'price': current,
+                        'change_pct': change_pct,
+                        'pullback_pct': pullback_pct,
+                        'score': score,
+                        'sector': sector_name,
+                        'ma30': ma30,
+                        'ma60': ma60,
+                        'reasons': reasons,
+                        'strategy': '抄底型',
+                        'time': datetime.now().strftime('%H:%M'),
+                        'suggestion': f'板块前景好+回调{pullback_pct:.1f}%+均线支撑，抄底机会'
+                    })
             
             bottoms.sort(key=lambda x: x['score'], reverse=True)
             self.bottom_fishing = bottoms[:8]
@@ -339,8 +422,61 @@ class AutoWatchlistManager:
         
         return self.bottom_fishing
     
+    def _format_strategy_notes(self, signal: Dict, strategy_type: str) -> str:
+        """格式化策略notes，包含完整信息"""
+        emoji_map = {
+            '强势股低吸': '💧',
+            '追涨型': '🚀',
+            '潜力型': '💎',
+            '抄底型': '🎯',
+            '多维度优选': '⭐',
+            '震荡整理': '⏳',
+            '板块补涨': '📈',
+            '基本面价值': '💰',
+            '重点-AI算力': '🤖',
+            '重点-半导体': '🔌',
+            '重点-新能源': '🔋',
+            '重点-机器人': '🦾'
+        }
+        emoji = emoji_map.get(strategy_type, '✳️')
+        
+        # 基础信息
+        parts = [
+            f"{emoji}[{strategy_type}]",
+            f"评分:{signal['score']}分",
+            f"价格:{signal['price']:.2f}",
+            f"涨幅:{signal.get('change_pct', 0):+.2f}%"
+        ]
+        
+        # 策略触发原因（详细列出）
+        if 'reasons' in signal and signal['reasons']:
+            parts.append(f"触发:{'|'.join(signal['reasons'])}")
+        
+        # 多维度特有信息
+        if strategy_type == '多维度优选':
+            parts.append(f"趋势{signal.get('trend_score', 0):.0f}/资金{signal.get('fund_score', 0):.0f}/技术{signal.get('technical_score', 0):.0f}")
+            if 'suggestion' in signal:
+                parts.append(f"建议:{signal['suggestion'][:15]}")
+        
+        # 抄底特有信息
+        if strategy_type == '抄底型' and 'pullback_pct' in signal:
+            parts.append(f"回调:{signal['pullback_pct']:.1f}%")
+        
+        # 板块补涨特有
+        if strategy_type == '板块补涨':
+            parts.append(f"板块{signal.get('sector_change', 0):+.2f}%")
+        
+        # 基本面价值特有
+        if strategy_type == '基本面价值':
+            parts.append(f"PE{signal.get('pe', 0):.1f}/ROE{signal.get('roe', 0):.1f}%")
+        
+        # 时间戳
+        parts.append(f"@{signal.get('time', datetime.now().strftime('%H:%M'))}")
+        
+        return " | ".join(parts)
+    
     def auto_add_to_watchlist(self, signals: List[Dict] = None, strategy_type: str = "追涨型") -> int:
-        """自动将信号股加入自选，按策略分类"""
+        """自动将信号股加入自选，按策略分类，详细记录策略信息"""
         if signals is None:
             signals = self.buy_signals
         
@@ -365,9 +501,9 @@ class AutoWatchlistManager:
             '潜力型': 8,
             '抄底型': 7,
             '多维度优选': 9,
-            '震荡整理': 8,  # 新策略优先级
-            '板块补涨': 9,  # 新策略优先级
-            '基本面价值': 7,  # 新策略优先级
+            '震荡整理': 8,
+            '板块补涨': 9,
+            '基本面价值': 7,
             '重点-AI算力': 9,
             '重点-半导体': 9,
             '重点-新能源': 9,
@@ -380,9 +516,9 @@ class AutoWatchlistManager:
             '潜力型': '💎',
             '抄底型': '🎯',
             '多维度优选': '⭐',
-            '震荡整理': '⏳',  # 新策略emoji
-            '板块补涨': '📈',  # 新策略emoji
-            '基本面价值': '💰',  # 新策略emoji
+            '震荡整理': '⏳',
+            '板块补涨': '📈',
+            '基本面价值': '💰',
             '重点-AI算力': '🤖',
             '重点-半导体': '🔌',
             '重点-新能源': '🔋',
@@ -397,13 +533,16 @@ class AutoWatchlistManager:
         for signal in signals:
             code = signal['code']
             
+            # 生成详细的notes
+            detailed_notes = self._format_strategy_notes(signal, strategy_type)
+            
             # 如果已存在，更新
             if self.watchlist.exists(code):
                 self.watchlist.update(
                     code,
                     category=category,
                     priority=priority,
-                    notes=f"{emoji}{strategy_type}:{signal['score']}分 {' '.join(signal['reasons'])} {signal['time']}"
+                    notes=detailed_notes
                 )
             else:
                 # 新加入自选
@@ -412,8 +551,8 @@ class AutoWatchlistManager:
                     name=signal['name'],
                     category=category,
                     priority=priority,
-                    tags=["自动发现", strategy_type],
-                    notes=f"{emoji}{strategy_type} {signal['score']}分 {' '.join(signal['reasons'])} 价格:{signal['price']:.2f}"
+                    tags=["自动发现", strategy_type, signal.get('sector', '')],
+                    notes=detailed_notes
                 )
                 added_count += 1
         
@@ -631,7 +770,18 @@ class AutoWatchlistManager:
                     print(f"    【{current_sector}】")
                 print(f"      {s['name']}({s['code']}) 综合{s['score']:.0f}分")
         
-        # 9. 清理走坏的股票
+        # 9. 急跌反弹（新增）
+        print("\n【策略9: 急跌反弹 - 单日大跌后的反弹机会】")
+        print("   核心逻辑：单日大跌>4%，恐慌抛售后的反弹机会")
+        flash_crash_signals = self.scan_flash_crash_rebound()
+        flash_crash_added = self.auto_add_to_watchlist(flash_crash_signals, '急跌反弹')
+        print(f"  发现 {len(flash_crash_signals)} 个急跌反弹机会，新增 {flash_crash_added} 只")
+        if flash_crash_signals:
+            print("  急跌反弹标的：")
+            for s in flash_crash_signals[:5]:
+                print(f"    ⚡ {s['name']}({s['code']}) 跌{s['change_pct']:.1f}% 评分{s['score']}分")
+        
+        # 10. 清理走坏的股票
         removed = self.auto_remove_from_watchlist()
         print(f"\n  降级 {removed} 只走坏的股票")
         
@@ -842,6 +992,88 @@ class AutoWatchlistManager:
             print(f"扫描价值股失败: {e}")
         
         return value_stocks[:10]
+    
+    def scan_flash_crash_rebound(self) -> List[Dict]:
+        """
+        新增策略9: 急跌反弹 - 单日大跌后的反弹机会
+        特征：
+        1. 单日大跌 >4%（恐慌抛售）
+        2. 属于热门板块核心标的
+        3. 未出现连续跌停（流动性还在）
+        4. 基本面健康（综合评分>50）
+        """
+        rebound_opportunities = []
+        
+        try:
+            # 扫描热门板块核心标的
+            scan_pool = self._get_default_scan_pool()
+            stock_data = data_fetcher.get_stock_data(scan_pool[:50])
+            analyzer = get_analyzer()
+            
+            for code in scan_pool[:50]:
+                if code not in stock_data:
+                    continue
+                
+                data = stock_data[code]
+                change_pct = data.get('change_pct', 0)
+                
+                # 条件1: 单日大跌 >4%
+                if change_pct < -4:
+                    score = 50  # 基础分
+                    reasons = [f"急跌{change_pct:.1f}%"]
+                    
+                    # 条件2: 热门板块属性
+                    sector_name = self._get_stock_sector(code)
+                    if sector_name:
+                        score += 15
+                        reasons.append(f"热门-{sector_name}")
+                    
+                    # 条件3: 基本面检查（放宽到40分，急跌时基本面可以适当放宽）
+                    result = analyzer.analyze_stock(code)
+                    if result and result.total_score >= 40:
+                        score += min(20, result.total_score - 40)
+                        reasons.append(f"基本面{result.total_score:.0f}分")
+                    elif result:
+                        # 基本面稍差但跌幅大，仍然可以考虑
+                        score += 5
+                        reasons.append(f"基本面{result.total_score:.0f}分(偏低)")
+                    
+                    # 条件4: 未连续大跌（今天开盘不是直接跌停）
+                    open_price = data.get('open', 0)
+                    prev_close = data.get('prev_close', 0)
+                    if open_price > 0 and prev_close > 0:
+                        gap_pct = (open_price - prev_close) / prev_close * 100
+                        if gap_pct > -5:  # 不是直接大幅低开
+                            score += 10
+                            reasons.append("未直接跳空")
+                    
+                    # 条件5: 成交量未过度放大（不是恐慌踩踏）
+                    volume_ratio = data.get('volume_ratio', 1)
+                    if volume_ratio < 2.0:  # 成交量未翻倍
+                        score += 5
+                        reasons.append("未放量恐慌")
+                    
+                    if score >= 65:
+                        rebound_opportunities.append({
+                            'code': code,
+                            'name': data.get('name', code),
+                            'price': data.get('current', 0),
+                            'change_pct': change_pct,
+                            'score': score,
+                            'sector': sector_name or '',
+                            'volume_ratio': volume_ratio,
+                            'reasons': reasons,
+                            'strategy': '急跌反弹',
+                            'suggestion': f'单日大跌{change_pct:.1f}%，恐慌抛售，关注反弹机会',
+                            'time': datetime.now().strftime('%H:%M')
+                        })
+            
+            rebound_opportunities.sort(key=lambda x: x['score'], reverse=True)
+            
+        except Exception as e:
+            print(f"扫描急跌反弹失败: {e}")
+        
+        return rebound_opportunities[:10]
     
     def scan_focus_sectors(self, focus_sectors: List[str] = None) -> List[Dict]:
         """
