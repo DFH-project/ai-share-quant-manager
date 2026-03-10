@@ -15,6 +15,7 @@ from core.sector_tracker import get_sector_tracker
 from core.auto_watchlist_manager import get_auto_manager
 from core.multi_dimension_analyzer import get_analyzer
 from core.intraday_monitor_v2 import IntradayMonitorV2
+from core.smart_alert_system import SmartAlertSystem  # 智能预警系统
 from typing import List, Dict
 from datetime import datetime
 import json
@@ -30,6 +31,7 @@ class IntegratedIntradayMonitor:
         self.auto_manager = get_auto_manager()
         self.analyzer = get_analyzer()
         self.monitor_v2 = IntradayMonitorV2()
+        self.alert_system = SmartAlertSystem()  # 智能预警系统
         
         # 确保V2数据已迁移
         if len(self.watchlist_v2.get_all()) == 0 and len(self.watchlist_v1.get_all()) > 0:
@@ -212,7 +214,7 @@ class IntegratedIntradayMonitor:
         }
     
     def quick_monitor(self):
-        """快速监控模式 - 只监控特别关注股票"""
+        """快速监控模式 - 只监控特别关注股票 + 智能预警检查"""
         print("\n" + "="*80)
         print(f"⚡ 快速监控模式 - {datetime.now().strftime('%H:%M:%S')}")
         print("="*80)
@@ -248,12 +250,32 @@ class IntegratedIntradayMonitor:
                     'code': item.code,
                     'name': item.name,
                     'change_pct': change_pct,
-                    'price': price
+                    'price': price,
+                    'type': '大幅波动'
                 })
             else:
                 print(f"  {emoji} {item.name}({item.code}) {change_pct:+.2f}% {price:.2f}")
         
-        print(f"\n提醒: {len(alerts)}只股票波动超过3%")
+        # 智能预警检查 - 新增功能
+        print(f"\n🚨 智能预警检查:")
+        alert_events = self.alert_system.check_alerts(codes)
+        
+        if alert_events:
+            print(f"  ⚠️ 触发 {len(alert_events)} 个预警:")
+            for event in alert_events:
+                level_emoji = "🔴" if event.level == "CRITICAL" else ("🟡" if event.level == "WARNING" else "🔵")
+                print(f"    {level_emoji} {event.message}")
+                alerts.append({
+                    'code': event.code,
+                    'name': event.name,
+                    'type': event.alert_type,
+                    'message': event.message,
+                    'level': event.level
+                })
+        else:
+            print(f"  ✅ 无预警触发")
+        
+        print(f"\n提醒: {len(alerts)}个信号需要关注")
         return alerts
 
 
@@ -266,6 +288,7 @@ def main():
     parser.add_argument('--full', action='store_true', help='全量模式（包含板块扫描）')
     parser.add_argument('--v2-list', action='store_true', help='显示V2自选股列表')
     parser.add_argument('--detail', type=str, help='查看某只股票的详细分析')
+    parser.add_argument('--with-alerts', action='store_true', help='启用智能预警推送')
     
     args = parser.parse_args()
     
@@ -283,12 +306,45 @@ def main():
     
     elif args.quick:
         # 快速模式
-        monitor.quick_monitor()
+        alerts = monitor.quick_monitor()
+        
+        # 如果有预警且启用了推送，发送到飞书
+        if args.with_alerts and alerts:
+            send_alert_notifications(alerts)
     
     else:
         # 标准模式（默认）
         full_scan = args.full
         monitor.run(full_scan=full_scan)
+
+
+def send_alert_notifications(alerts):
+    """发送预警通知到飞书"""
+    try:
+        # 筛选出预警类型的alert
+        alert_events = [a for a in alerts if a.get('type') in ['大幅波动', 'price_break_up', 'price_break_down', 'volume_surge', 'drawdown']]
+        
+        if not alert_events:
+            return
+        
+        # 构建消息
+        lines = ["🚨 智能预警触发", ""]
+        
+        for alert in alert_events[:5]:  # 最多显示5个
+            if alert.get('type') == '大幅波动':
+                emoji = "🔥" if alert.get('change_pct', 0) > 0 else "❄️"
+                lines.append(f"{emoji} {alert['name']}({alert['code']}) 波动 {alert['change_pct']:+.2f}%")
+            else:
+                lines.append(f"⚠️ {alert.get('message', alert.get('name', ''))}")
+        
+        message = "\n".join(lines)
+        
+        # 这里可以接入飞书推送
+        # 由于是在脚本中，可以通过写入文件或调用message工具
+        print(f"\n[预警推送]\n{message}")
+        
+    except Exception as e:
+        print(f"预警推送失败: {e}")
 
 
 if __name__ == '__main__':
