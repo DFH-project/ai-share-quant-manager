@@ -4,8 +4,8 @@
       "code": "603127",
       "name": "昭衍新药",
       "added_date": "2026-03-10",
-      "attention_level": "一般关注",
-      "strategy_type": "板块龙头",
+      "attention_level": "特别关注",
+      "strategy_type": "持仓监控型",
       "category": "default",
       "tags": [],
       "linked_sectors": [
@@ -34,7 +34,22 @@
       "priority": 50,
       "alert_threshold": {},
       "notes": "🏆医药龙头 +3.60%",
-      "update_history": [],
+      "update_history": [
+        {
+          "time": "2026-03-10 12:33:56",
+          "field": "attention_level",
+          "old": "一般关注",
+          "new": "特别关注",
+          "reason": ""
+        },
+        {
+          "time": "2026-03-10 12:33:56",
+          "field": "strategy_type",
+          "old": "板块龙头",
+          "new": "持仓监控型",
+          "reason": ""
+        }
+      ],
       "performance_tracking": {}
     },
     {
@@ -150,8 +165,8 @@
       "code": "002085",
       "name": "万丰奥威",
       "added_date": "2026-03-10",
-      "attention_level": "一般关注",
-      "strategy_type": "多维优选型",
+      "attention_level": "特别关注",
+      "strategy_type": "持仓监控型",
       "category": "default",
       "tags": [],
       "linked_sectors": [
@@ -179,7 +194,22 @@
       "priority": 50,
       "alert_threshold": {},
       "notes": "⭐多维度优选 65.0分 综合评分65 趋势80 资金40 建议买入，整体向好 价格:16.74",
-      "update_history": [],
+      "update_history": [
+        {
+          "time": "2026-03-10 12:33:56",
+          "field": "attention_level",
+          "old": "一般关注",
+          "new": "特别关注",
+          "reason": ""
+        },
+        {
+          "time": "2026-03-10 12:33:56",
+          "field": "strategy_type",
+          "old": "多维优选型",
+          "new": "持仓监控型",
+          "reason": ""
+        }
+      ],
       "performance_tracking": {}
     },
     {
@@ -259,7 +289,7 @@
       "name": "长电科技",
       "added_date": "2026-03-10",
       "attention_level": "特别关注",
-      "strategy_type": "低吸型",
+      "strategy_type": "持仓监控型",
       "category": "default",
       "tags": [],
       "linked_sectors": [
@@ -287,7 +317,22 @@
       "priority": 90,
       "alert_threshold": {},
       "notes": "💧强势股低吸 60分 热门板块-半导体 良性回调 未放量恐慌 价格:47.98",
-      "update_history": [],
+      "update_history": [
+        {
+          "time": "2026-03-10 12:33:56",
+          "field": "attention_level",
+          "old": "特别关注",
+          "new": "特别关注",
+          "reason": ""
+        },
+        {
+          "time": "2026-03-10 12:33:56",
+          "field": "strategy_type",
+          "old": "低吸型",
+          "new": "持仓监控型",
+          "reason": ""
+        }
+      ],
       "performance_tracking": {}
     },
     {
@@ -366,8 +411,8 @@
       "code": "601138",
       "name": "工业富联",
       "added_date": "2026-03-10",
-      "attention_level": "一般关注",
-      "strategy_type": "追涨型",
+      "attention_level": "特别关注",
+      "strategy_type": "持仓监控型",
       "category": "default",
       "tags": [],
       "linked_sectors": [
@@ -397,7 +442,22 @@
       "priority": 50,
       "alert_threshold": {},
       "notes": "🤖[重点-AI算力] | 评分:55.5分 | 价格:51.55 | 涨幅:-5.12% | 触发:重点板块-AI算力|综合56分|观望，等待更明确信号 | @10:04",
-      "update_history": [],
+      "update_history": [
+        {
+          "time": "2026-03-10 12:33:56",
+          "field": "attention_level",
+          "old": "一般关注",
+          "new": "特别关注",
+          "reason": ""
+        },
+        {
+          "time": "2026-03-10 12:33:56",
+          "field": "strategy_type",
+          "old": "追涨型",
+          "new": "持仓监控型",
+          "reason": ""
+        }
+      ],
       "performance_tracking": {}
     },
     {
@@ -698,14 +758,219 @@
       "notes": "💧[强势股低吸] | 评分:50分 | 价格:27.73 | 涨幅:-3.98% | 触发:热门板块-半导体|深度回调|未放量恐慌 | @10:03",
       "update_history": [],
       "performance_tracking": {}
+    },
+    {
+      "code": "513180",
+      "name": "恒生科技指数ETF",
+      "added_date": "2026-03-10",
+      "attention_level": "特别关注",
+      "strategy_type": "持仓监控型",
+      "category": "default",
+      "tags": [],
+      "linked_sectors": [
+        "持仓股"
+      ],
+      "selection_reason": {
+        "primary_reason": "持仓股 | 成本¥0.71 | 数量7000股",
+        "secondary_reasons": [
+          "实际持仓，需高频监控",
+          "自动止损止盈跟踪"
+        ],
+        "key_indicators": {
+          "成本价": 0.708,
+          "持仓数量": 7000
+        },
+        "market_context": "",
+        "sector_context": "",
+        "risk_factors": [],
+        "selection_time": "2026-03-10 12:33",
+        "expected_scenario": "基于大盘和板块分析，寻找换仓或加仓机会",
+        "invalidation_conditions": []
+      },
+      "entry_plan": {
+        "entry_price": 0.708,
+        "stop_loss": 0.6513599999999999,
+        "target_price": 0.8141999999999999,
+        "position_size": "已持仓",
+        "holding_period": "中期"
+      },
+      "priority": 90,
+      "alert_threshold": {},
+      "notes": "📈持仓股 | 成本¥0.71 | 止损¥0.65 | 止盈¥0.81",
+      "update_history": [],
+      "performance_tracking": {}
+    },
+    {
+      "code": "600733",
+      "name": "北汽蓝谷",
+      "added_date": "2026-03-10",
+      "attention_level": "特别关注",
+      "strategy_type": "持仓监控型",
+      "category": "default",
+      "tags": [],
+      "linked_sectors": [
+        "持仓股"
+      ],
+      "selection_reason": {
+        "primary_reason": "持仓股 | 成本¥8.90 | 数量200股",
+        "secondary_reasons": [
+          "实际持仓，需高频监控",
+          "自动止损止盈跟踪"
+        ],
+        "key_indicators": {
+          "成本价": 8.9,
+          "持仓数量": 200
+        },
+        "market_context": "",
+        "sector_context": "",
+        "risk_factors": [],
+        "selection_time": "2026-03-10 12:33",
+        "expected_scenario": "基于大盘和板块分析，寻找换仓或加仓机会",
+        "invalidation_conditions": []
+      },
+      "entry_plan": {
+        "entry_price": 8.9,
+        "stop_loss": 8.188,
+        "target_price": 10.235,
+        "position_size": "已持仓",
+        "holding_period": "中期"
+      },
+      "priority": 90,
+      "alert_threshold": {},
+      "notes": "📈持仓股 | 成本¥8.90 | 止损¥8.19 | 止盈¥10.23",
+      "update_history": [],
+      "performance_tracking": {}
+    },
+    {
+      "code": "600756",
+      "name": "浪潮软件",
+      "added_date": "2026-03-10",
+      "attention_level": "特别关注",
+      "strategy_type": "持仓监控型",
+      "category": "default",
+      "tags": [],
+      "linked_sectors": [
+        "持仓股"
+      ],
+      "selection_reason": {
+        "primary_reason": "持仓股 | 成本¥18.50 | 数量100股",
+        "secondary_reasons": [
+          "实际持仓，需高频监控",
+          "自动止损止盈跟踪"
+        ],
+        "key_indicators": {
+          "成本价": 18.5,
+          "持仓数量": 100
+        },
+        "market_context": "",
+        "sector_context": "",
+        "risk_factors": [],
+        "selection_time": "2026-03-10 12:33",
+        "expected_scenario": "基于大盘和板块分析，寻找换仓或加仓机会",
+        "invalidation_conditions": []
+      },
+      "entry_plan": {
+        "entry_price": 18.5,
+        "stop_loss": 17.02,
+        "target_price": 21.275,
+        "position_size": "已持仓",
+        "holding_period": "中期"
+      },
+      "priority": 90,
+      "alert_threshold": {},
+      "notes": "📈持仓股 | 成本¥18.50 | 止损¥17.02 | 止盈¥21.27",
+      "update_history": [],
+      "performance_tracking": {}
+    },
+    {
+      "code": "002050",
+      "name": "三花智控",
+      "added_date": "2026-03-10",
+      "attention_level": "特别关注",
+      "strategy_type": "持仓监控型",
+      "category": "default",
+      "tags": [],
+      "linked_sectors": [
+        "持仓股"
+      ],
+      "selection_reason": {
+        "primary_reason": "持仓股 | 成本¥51.14 | 数量200股",
+        "secondary_reasons": [
+          "实际持仓，需高频监控",
+          "自动止损止盈跟踪"
+        ],
+        "key_indicators": {
+          "成本价": 51.14,
+          "持仓数量": 200
+        },
+        "market_context": "",
+        "sector_context": "",
+        "risk_factors": [],
+        "selection_time": "2026-03-10 12:33",
+        "expected_scenario": "基于大盘和板块分析，寻找换仓或加仓机会",
+        "invalidation_conditions": []
+      },
+      "entry_plan": {
+        "entry_price": 51.14,
+        "stop_loss": 47.0488,
+        "target_price": 58.81099999999999,
+        "position_size": "已持仓",
+        "holding_period": "中期"
+      },
+      "priority": 90,
+      "alert_threshold": {},
+      "notes": "📈持仓股 | 成本¥51.14 | 止损¥47.05 | 止盈¥58.81",
+      "update_history": [],
+      "performance_tracking": {}
+    },
+    {
+      "code": "002230",
+      "name": "科大讯飞",
+      "added_date": "2026-03-10",
+      "attention_level": "特别关注",
+      "strategy_type": "持仓监控型",
+      "category": "default",
+      "tags": [],
+      "linked_sectors": [
+        "持仓股"
+      ],
+      "selection_reason": {
+        "primary_reason": "持仓股 | 成本¥51.79 | 数量100股",
+        "secondary_reasons": [
+          "实际持仓，需高频监控",
+          "自动止损止盈跟踪"
+        ],
+        "key_indicators": {
+          "成本价": 51.79,
+          "持仓数量": 100
+        },
+        "market_context": "",
+        "sector_context": "",
+        "risk_factors": [],
+        "selection_time": "2026-03-10 12:33",
+        "expected_scenario": "基于大盘和板块分析，寻找换仓或加仓机会",
+        "invalidation_conditions": []
+      },
+      "entry_plan": {
+        "entry_price": 51.79,
+        "stop_loss": 47.6468,
+        "target_price": 59.558499999999995,
+        "position_size": "已持仓",
+        "holding_period": "中期"
+      },
+      "priority": 90,
+      "alert_threshold": {},
+      "notes": "📈持仓股 | 成本¥51.79 | 止损¥47.65 | 止盈¥59.56",
+      "update_history": [],
+      "performance_tracking": {}
     }
   ],
   "categories": [
-    "自选",
     "关注",
     "default",
-    "观察",
-    "持仓"
+    "持仓",
+    "自选",
+    "观察"
   ],
-  "updated_at": "2026-03-10 11:07:13"
+  "updated_at": "2026-03-10 12:33:56"
 }

@@ -1,271 +1,383 @@
-#!/usr/bin/env python3
 """
-智能调仓顾问 - Smart Rebalance Advisor
-整合持仓健康分析 + 换仓机会分析，生成最终调仓方案
+smart_rebalance_advisor.py - 智能调仓建议系统
+基于机会成本计算和组合优化，给出换仓/加仓/止损建议
 """
 
-import sys
-import os
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from core.position_health_analyzer import get_health_analyzer
-from core.position_rebalance_engine import get_rebalance_engine
-from core.auto_watchlist_manager import get_auto_manager
-from typing import Dict, List
-from datetime import datetime
 import json
+import numpy as np
+from typing import Dict, List, Tuple, Optional
+from dataclasses import dataclass
+from datetime import datetime
 from pathlib import Path
 
 
+@dataclass
+class RebalanceOpportunity:
+    """调仓机会"""
+    hold_code: str
+    hold_name: str
+    hold_pnl_pct: float
+    candidate_code: str
+    candidate_name: str
+    candidate_score: float
+    opportunity_cost: float  # 机会成本（年化预期收益差）
+    swap_confidence: float  # 换仓置信度 0-100
+    recommendation: str  # HOLD/SWAP/ADD/STOP
+    reasoning: str  # 详细理由
+
+
+@dataclass
+class PositionAdvice:
+    """持仓建议"""
+    code: str
+    name: str
+    current_pnl: float
+    action: str  # HOLD/ADD/REDUCE/STOP
+    target_weight: float  # 目标仓位占比
+    confidence: float
+    reasoning: str
+
+
 class SmartRebalanceAdvisor:
-    """智能调仓顾问 - 生成完整的调仓方案"""
+    """智能调仓顾问"""
     
-    def __init__(self):
-        self.health_analyzer = get_health_analyzer()
-        self.rebalance_engine = get_rebalance_engine()
-        self.auto_manager = get_auto_manager()
-    
-    def generate_full_analysis(self) -> Dict:
-        """生成完整的持仓分析和调仓建议"""
+    def __init__(self, data_fetcher, risk_manager, llm_reasoner):
+        self.data_fetcher = data_fetcher
+        self.risk_manager = risk_manager
+        self.llm_reasoner = llm_reasoner
         
-        print("\n" + "=" * 70)
-        print("🤖 智能调仓分析系统启动")
-        print("=" * 70)
-        
-        # 1. 持仓健康度分析
-        print("\n📊 Step 1: 分析持仓健康度...")
-        health_reports = self.health_analyzer.analyze_all_positions()
-        
-        # 2. 换仓机会扫描
-        print("\n🔄 Step 2: 扫描换仓机会...")
-        opportunities = self.rebalance_engine.find_best_switches(top_n=5)
-        
-        # 3. 策略选股汇总
-        print("\n✨ Step 3: 汇总策略选股...")
-        strategy_signals = self._get_strategy_summary()
-        
-        # 4. 生成综合建议
-        print("\n💡 Step 4: 生成综合调仓方案...")
-        recommendations = self._generate_recommendations(
-            health_reports, opportunities
-        )
-        
-        return {
-            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M'),
-            'health_reports': health_reports,
-            'opportunities': opportunities,
-            'strategy_signals': strategy_signals,
-            'recommendations': recommendations
+        # 配置
+        self.config = {
+            'swap_threshold': 0.10,  # 换仓阈值（预期收益差>10%）
+            'stop_loss_threshold': -0.10,  # 止损阈值
+            'take_profit_threshold': 0.15,  # 止盈阈值
+            'max_position_weight': 0.20,  # 单股最大仓位
+            'min_position_weight': 0.05,  # 单股最小仓位
         }
     
-    def _get_strategy_summary(self) -> Dict:
-        """获取策略选股汇总"""
-        signals = self.rebalance_engine.get_strategy_signals()
+    def calculate_opportunity_cost(self, hold_stock: Dict, candidate: Dict) -> float:
+        """
+        计算换仓机会成本
         
-        by_strategy = {}
-        for s in signals:
-            strategy = s.get('strategy_type', '其他')
-            if strategy not in by_strategy:
-                by_strategy[strategy] = []
-            by_strategy[strategy].append(s)
+        机会成本 = (候选股预期收益 - 持仓股预期收益) × 时间权重
+        """
+        # 持仓股预期收益（基于当前趋势和基本面）
+        hold_expected_return = self._estimate_expected_return(hold_stock)
         
-        # 取各策略前3名
-        top_by_strategy = {}
-        for strategy, sigs in by_strategy.items():
-            sigs.sort(key=lambda x: x['score'], reverse=True)
-            top_by_strategy[strategy] = sigs[:3]
+        # 候选股预期收益（基于策略评分）
+        cand_expected_return = self._estimate_expected_return(candidate)
         
-        return top_by_strategy
+        # 计算收益差
+        return_diff = cand_expected_return - hold_expected_return
+        
+        # 考虑换仓成本（手续费+滑点，约0.2%）
+        transaction_cost = 0.002
+        
+        # 净机会成本
+        opportunity_cost = return_diff - transaction_cost * 2  # 买卖各一次
+        
+        return opportunity_cost
     
-    def _generate_recommendations(self, health_reports, opportunities) -> List[Dict]:
-        """生成综合调仓建议"""
-        recommendations = []
+    def _estimate_expected_return(self, stock: Dict) -> float:
+        """估算预期收益（年化）"""
+        # 基于策略评分估算
+        score = stock.get('score', 50)
         
-        # 分类持仓
-        exit_list = []  # 建议清仓
-        reduce_list = []  # 建议减仓
-        hold_list = []  # 建议持有
-        wait_rebound_list = []  # 建议等反弹
+        # 评分转换为预期收益（简化模型）
+        # 假设：50分对应5%预期收益，每增加1分增加0.3%
+        base_return = 0.05
+        score_contribution = (score - 50) * 0.003
         
-        for report in health_reports:
-            if report.action == "EXIT":
-                exit_list.append(report)
-            elif report.action == "REDUCE":
-                reduce_list.append(report)
-            elif report.action == "WAIT_REBOUND":
-                wait_rebound_list.append(report)
-            else:
-                hold_list.append(report)
+        expected = base_return + score_contribution
         
-        # 生成建议列表
-        if exit_list:
-            recommendations.append({
-                'type': 'URGENT_EXIT',
-                'title': '⚠️ 紧急止损',
-                'stocks': [f"{r.name}({r.code}) 亏{r.pnl_pct:.1f}%" for r in exit_list],
-                'action': '立即清仓',
-                'reason': '深度套牢且趋势恶化，继续持有风险极高'
-            })
+        # 考虑当前盈亏（均值回归效应）
+        pnl = stock.get('pnl_pct', 0)
+        if pnl > 0.20:  # 已涨20%以上，预期收益降低
+            expected *= 0.7
+        elif pnl < -0.15:  # 已跌15%以上，预期收益提升（反弹）
+            expected *= 1.3
         
-        if wait_rebound_list:
-            for r in wait_rebound_list:
-                if r.rebound_target:
-                    rebound_pnl = (r.rebound_target - r.cost_price) / r.cost_price * 100
-                    recommendations.append({
-                        'type': 'WAIT_REBOUND',
-                        'title': f'⏳ 等反弹减仓 - {r.name}',
-                        'stock': f"{r.name}({r.code})",
-                        'current_pnl': f"{r.pnl_pct:.1f}%",
-                        'target_price': f"{r.rebound_target:.2f}",
-                        'target_pnl': f"{rebound_pnl:.1f}%",
-                        'rebound_prob': f"{r.rebound_probability:.0f}%",
-                        'action': f'等反弹到{r.rebound_target:.2f}（{rebound_pnl:.1f}%）减仓',
-                        'reason': f'当前亏{r.pnl_pct:.1f}%，反弹概率{r.rebound_probability:.0f}%，建议减亏卖出'
-                    })
-        
-        if opportunities:
-            best = opportunities[0]
-            recommendations.append({
-                'type': 'SWITCH',
-                'title': f'🔄 优先换仓 - {best.sell_name} → {best.buy_name}',
-                'sell': f"{best.sell_name}({best.sell_code}) {best.sell_pnl:+.1f}%",
-                'buy': f"{best.buy_name}({best.buy_code}) {best.buy_strategy}",
-                'score': f"{best.opportunity_score:.0f}分",
-                'expected_gain': f"{best.expected_gain_diff:+.1f}%",
-                'action': f'卖出{best.sell_name}，买入{best.buy_name}',
-                'reason': f'换仓预期多赚{best.expected_gain_diff:.1f}%，风险降低{best.risk_reduction:.0f}分'
-            })
-        
-        if reduce_list:
-            recommendations.append({
-                'type': 'REDUCE',
-                'title': '⚡ 建议减仓',
-                'stocks': [f"{r.name}({r.code}) 亏{r.pnl_pct:.1f}%" for r in reduce_list[:3]],
-                'action': '减仓观望',
-                'reason': '趋势走弱，建议降低仓位'
-            })
-        
-        # 持仓健康提醒
-        healthy_count = len([r for r in health_reports if r.health_status == "健康"])
-        if healthy_count == 0 and len(health_reports) > 0:
-            recommendations.append({
-                'type': 'PORTfolio_WARNING',
-                'title': '🔴 持仓健康度警告',
-                'action': '全面审视持仓结构',
-                'reason': f'全部{len(health_reports)}只持仓健康度均不理想，建议大幅调整'
-            })
-        
-        return recommendations
+        return max(-0.10, min(0.30, expected))  # 限制在-10%到30%
     
-    def generate_comprehensive_report(self, analysis: Dict) -> str:
-        """生成综合报告"""
+    def analyze_swap_opportunities(self, holdings: List[Dict], 
+                                   candidates: List[Dict]) -> List[RebalanceOpportunity]:
+        """分析换仓机会"""
+        opportunities = []
         
-        lines = []
-        lines.append("\n" + "=" * 70)
-        lines.append(f"📋 智能调仓分析报告 - {analysis['timestamp']}")
-        lines.append("=" * 70)
-        
-        # 持仓健康总览
-        health_reports = analysis['health_reports']
-        if health_reports:
-            lines.append(self.health_analyzer.generate_health_summary(health_reports))
-        
-        # 核心调仓建议
-        recommendations = analysis['recommendations']
-        if recommendations:
-            lines.append("\n🎯 核心调仓建议")
-            lines.append("=" * 70)
+        for hold in holdings:
+            hold_code = hold['code']
+            hold_name = hold['name']
+            hold_pnl = hold.get('pnl_pct', 0)
             
-            for i, rec in enumerate(recommendations[:5], 1):
-                lines.append(f"\n{i}. {rec['title']}")
-                lines.append("-" * 50)
+            for cand in candidates:
+                cand_code = cand['code']
                 
-                if 'stock' in rec:
-                    lines.append(f"   股票: {rec['stock']}")
-                if 'stocks' in rec:
-                    for s in rec['stocks']:
-                        lines.append(f"   • {s}")
-                if 'sell' in rec:
-                    lines.append(f"   卖出: {rec['sell']}")
-                    lines.append(f"   买入: {rec['buy']}")
-                if 'current_pnl' in rec:
-                    lines.append(f"   当前: {rec['current_pnl']} → 目标: {rec['target_pnl']} @ {rec['target_price']}")
-                    lines.append(f"   反弹概率: {rec['rebound_prob']}")
-                if 'score' in rec:
-                    lines.append(f"   机会评分: {rec['score']} | 预期收益差: {rec['expected_gain']}")
+                # 跳过已持仓的股票
+                if cand_code == hold_code:
+                    continue
                 
-                lines.append(f"   💡 建议: {rec['action']}")
-                lines.append(f"   📌 理由: {rec['reason']}")
+                # 计算机会成本
+                opp_cost = self.calculate_opportunity_cost(hold, cand)
+                
+                # 只有机会成本为正才考虑换仓
+                if opp_cost > self.config['swap_threshold']:
+                    # 计算置信度
+                    confidence = self._calculate_swap_confidence(hold, cand, opp_cost)
+                    
+                    # 生成建议
+                    if hold_pnl < -0.10 and confidence > 70:
+                        recommendation = "SWAP"
+                    elif hold_pnl < 0 and confidence > 80:
+                        recommendation = "SWAP"
+                    else:
+                        recommendation = "CONSIDER"
+                    
+                    # 生成理由
+                    reasoning = self.llm_reasoner.generate_comparison(hold, cand)
+                    
+                    opp = RebalanceOpportunity(
+                        hold_code=hold_code,
+                        hold_name=hold_name,
+                        hold_pnl_pct=hold_pnl,
+                        candidate_code=cand_code,
+                        candidate_name=cand['name'],
+                        candidate_score=cand.get('score', 0),
+                        opportunity_cost=opp_cost,
+                        swap_confidence=confidence,
+                        recommendation=recommendation,
+                        reasoning=reasoning
+                    )
+                    opportunities.append(opp)
         
-        # 换仓机会详情
-        opportunities = analysis['opportunities']
-        if opportunities:
-            lines.append(self.rebalance_engine.generate_rebalance_report(opportunities))
-        
-        # 策略选股参考
-        strategy_signals = analysis['strategy_signals']
-        if strategy_signals:
-            lines.append("\n📈 当前策略选股参考")
-            lines.append("=" * 70)
-            for strategy, signals in list(strategy_signals.items())[:3]:
-                lines.append(f"\n{strategy}:")
-                for s in signals[:2]:
-                    lines.append(f"  • {s['name']}({s['code']}) {s['score']}分")
-        
-        # 执行计划
-        lines.append("\n📅 建议执行计划")
-        lines.append("=" * 70)
-        lines.append(self._generate_action_plan(recommendations))
-        
-        lines.append("\n" + "=" * 70)
-        lines.append("💡 提示: 以上建议基于量化模型，请结合市场情绪和自身风险承受力决策")
-        lines.append("=" * 70)
-        
-        return "\n".join(lines)
+        # 按机会成本排序
+        opportunities.sort(key=lambda x: x.opportunity_cost, reverse=True)
+        return opportunities[:5]  # 返回前5个最佳机会
     
-    def _generate_action_plan(self, recommendations: List[Dict]) -> str:
-        """生成执行计划"""
+    def _calculate_swap_confidence(self, hold: Dict, cand: Dict, opp_cost: float) -> float:
+        """计算换仓置信度"""
+        confidence = 50.0
+        
+        # 机会成本因素（权重30%）
+        confidence += min(30, opp_cost * 200)  # 每1%机会成本加20分
+        
+        # 持仓亏损程度（权重25%）
+        hold_pnl = hold.get('pnl_pct', 0)
+        if hold_pnl < -0.15:
+            confidence += 25
+        elif hold_pnl < -0.10:
+            confidence += 15
+        elif hold_pnl < -0.05:
+            confidence += 5
+        
+        # 候选股评分（权重25%）
+        cand_score = cand.get('score', 50)
+        confidence += min(25, (cand_score - 50) * 0.8)
+        
+        # 风险因素（权重20%，扣分项）
+        cand_tail_risk = cand.get('tail_risk', 50)
+        if cand_tail_risk > 70:
+            confidence -= 20
+        elif cand_tail_risk > 60:
+            confidence -= 10
+        
+        return max(0, min(100, confidence))
+    
+    def optimize_portfolio_weights(self, holdings: List[Dict], 
+                                   total_value: float) -> List[PositionAdvice]:
+        """
+        优化组合仓位权重
+        
+        使用简化版MPT（均值-方差优化）
+        """
+        advices = []
+        
+        # 计算每只股票的评分（用于确定目标权重）
+        scores = []
+        for h in holdings:
+            # 综合评分 = 策略评分 + 盈亏调整 + 风险调整
+            strategy_score = h.get('strategy_score', 50)
+            pnl = h.get('pnl_pct', 0)
+            risk_score = h.get('risk_score', 50)
+            
+            # 盈亏调整：盈利股降低权重（止盈），亏损股根据程度调整
+            pnl_adjust = 0
+            if pnl > 0.15:
+                pnl_adjust = -10  # 盈利超15%，降低配置
+            elif pnl < -0.10:
+                pnl_adjust = -15  # 深度亏损，降低配置
+            elif pnl < -0.05:
+                pnl_adjust = 5  # 轻度亏损，增加配置博反弹
+            
+            # 风险调整
+            risk_adjust = (50 - risk_score) * 0.2
+            
+            final_score = strategy_score + pnl_adjust + risk_adjust
+            scores.append(final_score)
+        
+        # 归一化权重
+        total_score = sum(scores) if sum(scores) > 0 else 1
+        target_weights = [s / total_score for s in scores]
+        
+        # 生成建议
+        for i, hold in enumerate(holdings):
+            code = hold['code']
+            name = hold['name']
+            current_value = hold.get('current_price', hold['cost_price']) * hold['quantity']
+            current_weight = current_value / total_value if total_value > 0 else 0
+            target_weight = target_weights[i]
+            pnl = hold.get('pnl_pct', 0)
+            
+            # 确定操作
+            weight_diff = target_weight - current_weight
+            
+            if weight_diff > 0.03:
+                action = "ADD"
+            elif weight_diff < -0.03:
+                action = "REDUCE"
+            else:
+                action = "HOLD"
+            
+            # 特殊情况：深度亏损
+            if pnl < -0.12:
+                action = "STOP"
+                target_weight = 0
+            
+            # 生成理由
+            if action == "ADD":
+                reasoning = f"目标仓位{target_weight*100:.1f}%高于当前{current_weight*100:.1f}%，建议加仓"
+            elif action == "REDUCE":
+                reasoning = f"目标仓位{target_weight*100:.1f}%低于当前{current_weight*100:.1f}%，建议减仓"
+            elif action == "STOP":
+                reasoning = f"深度亏损{pnl*100:.1f}%，建议止损"
+            else:
+                reasoning = f"当前仓位合理，维持持有"
+            
+            advice = PositionAdvice(
+                code=code,
+                name=name,
+                current_pnl=pnl,
+                action=action,
+                target_weight=target_weight,
+                confidence=min(95, 60 + abs(weight_diff) * 100),
+                reasoning=reasoning
+            )
+            advices.append(advice)
+        
+        return advices
+    
+    def generate_full_rebalance_report(self, holdings: List[Dict], 
+                                       candidates: List[Dict],
+                                       total_value: float,
+                                       cash: float) -> str:
+        """生成完整调仓报告"""
         lines = []
+        lines.append("="*80)
+        lines.append("🔄 AI智能调仓分析报告 | " + datetime.now().strftime("%H:%M:%S"))
+        lines.append("="*80)
         
-        urgent = [r for r in recommendations if r.get('type') == 'URGENT_EXIT']
-        wait_rebound = [r for r in recommendations if r.get('type') == 'WAIT_REBOUND']
-        switch = [r for r in recommendations if r.get('type') == 'SWITCH']
+        # 组合现状
+        lines.append("\n📊 组合现状")
+        lines.append("-"*80)
+        lines.append(f"总资产: ¥{total_value + cash:,.0f} (持仓¥{total_value:,.0f} + 现金¥{cash:,.0f})")
         
-        lines.append("【立即执行】")
-        if urgent:
-            lines.append(f"  • 止损清仓: {', '.join([u['stocks'][0] for u in urgent[:2]])}")
+        # 换仓机会
+        lines.append("\n🔄 换仓机会分析")
+        lines.append("-"*80)
+        
+        opportunities = self.analyze_swap_opportunities(holdings, candidates)
+        if opportunities:
+            for i, opp in enumerate(opportunities[:3], 1):
+                emoji = "🔴" if opp.recommendation == "SWAP" else "🟡"
+                lines.append(f"\n{emoji} 机会{i}: {opp.hold_name} → {opp.candidate_name}")
+                lines.append(f"   当前持仓盈亏: {opp.hold_pnl_pct*100:+.2f}%")
+                lines.append(f"   候选股评分: {opp.candidate_score:.0f}分")
+                lines.append(f"   预期收益差: {opp.opportunity_cost*100:+.1f}% (年化)")
+                lines.append(f"   换仓置信度: {opp.swap_confidence:.0f}%")
+                lines.append(f"   建议: {opp.recommendation}")
+                # 简化显示理由
+                lines.append(f"   理由: {opp.reasoning.split('### 换仓建议')[1].strip() if '### 换仓建议' in opp.reasoning else '详见分析'}")
         else:
-            lines.append("  • 暂无紧急操作")
+            lines.append("\n⚪ 未发现显著换仓机会")
+            lines.append("   当前持仓与候选股机会成本相近，建议维持现状")
         
-        lines.append("\n【观察等待】")
-        if wait_rebound:
-            for r in wait_rebound[:2]:
-                lines.append(f"  • {r['stock']}: 等反弹到{r['target_price']}减仓")
+        # 仓位优化建议
+        lines.append("\n" + "="*80)
+        lines.append("⚖️ 仓位优化建议")
+        lines.append("-"*80)
         
-        lines.append("\n【择机执行】")
-        if switch:
-            r = switch[0]
-            lines.append(f"  • {r['action']}")
+        advices = self.optimize_portfolio_weights(holdings, total_value)
+        for advice in advices:
+            emoji = {"ADD": "📈", "REDUCE": "📉", "HOLD": "➡️", "STOP": "❌"}.get(advice.action, "➡️")
+            lines.append(f"\n{emoji} {advice.name}({advice.code})")
+            lines.append(f"   当前盈亏: {advice.current_pnl*100:+.2f}%")
+            lines.append(f"   建议操作: {advice.action}")
+            lines.append(f"   目标仓位: {advice.target_weight*100:.1f}%")
+            lines.append(f"   置信度: {advice.confidence:.0f}%")
+            lines.append(f"   理由: {advice.reasoning}")
         
+        # 综合建议
+        lines.append("\n" + "="*80)
+        lines.append("🎯 综合调仓建议")
+        lines.append("-"*80)
+        
+        # 找出最优先的操作
+        urgent_stops = [a for a in advices if a.action == "STOP"]
+        good_swaps = [o for o in opportunities if o.recommendation == "SWAP"]
+        
+        if urgent_stops:
+            lines.append("\n🔴 优先操作（止损）:")
+            for s in urgent_stops:
+                lines.append(f"   • 止损 {s.name}({s.code})，亏损{s.current_pnl*100:.1f}%")
+        
+        if good_swaps:
+            lines.append("\n🟢 优先操作（换仓）:")
+            for s in good_swaps[:2]:
+                lines.append(f"   • {s.hold_name} → {s.candidate_name}")
+                lines.append(f"     预期收益提升{s.opportunity_cost*100:.1f}%")
+        
+        if cash > total_value * 0.2 and opportunities:
+            lines.append("\n💰 现金配置建议:")
+            lines.append(f"   当前现金比例{cash/(total_value+cash)*100:.1f}%较高")
+            lines.append(f"   建议买入: {opportunities[0].candidate_name}({opportunities[0].candidate_code})")
+        
+        lines.append("\n" + "="*80)
         return "\n".join(lines)
-    
-    def save_report(self, report: str):
-        """保存报告"""
-        report_path = Path(__file__).parent.parent / 'data' / 'rebalance_report.txt'
-        with open(report_path, 'w', encoding='utf-8') as f:
-            f.write(report)
-        return report_path
 
 
-# 便捷函数
-def run_rebalance_analysis() -> str:
-    """运行完整的调仓分析"""
-    advisor = SmartRebalanceAdvisor()
-    analysis = advisor.generate_full_analysis()
-    report = advisor.generate_comprehensive_report(analysis)
-    advisor.save_report(report)
-    return report
+# 单例
+_rebalance_advisor = None
+
+def get_rebalance_advisor(data_fetcher=None, risk_manager=None, llm_reasoner=None):
+    """获取智能调仓顾问单例"""
+    global _rebalance_advisor
+    if _rebalance_advisor is None:
+        from core.data_fetcher import data_fetcher as df
+        from core.ai_risk_manager import get_ai_risk_manager
+        from core.llm_strategy_reasoning import get_llm_reasoner
+        
+        _rebalance_advisor = SmartRebalanceAdvisor(
+            data_fetcher or df,
+            risk_manager or get_ai_risk_manager(df),
+            llm_reasoner or get_llm_reasoner()
+        )
+    return _rebalance_advisor
 
 
 if __name__ == '__main__':
-    print(run_rebalance_analysis())
+    # 测试
+    advisor = get_rebalance_advisor()
+    
+    # 模拟持仓
+    holdings = [
+        {'code': '600733', 'name': '北汽蓝谷', 'cost_price': 8.90, 'current_price': 7.81, 'quantity': 200, 'pnl_pct': -0.1225, 'strategy_score': 45, 'risk_score': 75},
+        {'code': '600756', 'name': '浪潮软件', 'cost_price': 18.50, 'current_price': 16.33, 'quantity': 100, 'pnl_pct': -0.1173, 'strategy_score': 48, 'risk_score': 70},
+    ]
+    
+    # 模拟候选股
+    candidates = [
+        {'code': '300750', 'name': '宁德时代', 'score': 85, 'tail_risk': 40},
+        {'code': '300308', 'name': '中际旭创', 'score': 80, 'tail_risk': 45},
+    ]
+    
+    report = advisor.generate_full_rebalance_report(holdings, candidates, 50000, 12000)
+    print(report)

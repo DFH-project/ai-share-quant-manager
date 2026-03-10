@@ -31,26 +31,49 @@ def get_portfolio_info():
     return {'codes': [], 'details': {}}
 
 def generate_scan_report(result, portfolio_info):
-    """生成带持仓标记的扫描报告"""
+    """生成带持仓标记的扫描报告 - 简洁版"""
     portfolio_codes = portfolio_info['codes']
     portfolio_details = portfolio_info['details']
     
     report_lines = []
-    report_lines.append("🔥 **A股深度扫描完成** 🔥")
-    report_lines.append(f"扫描时间: {__import__('datetime').datetime.now().strftime('%H:%M')}")
+    report_lines.append("🔥 **A股深度扫描** | " + __import__('datetime').datetime.now().strftime('%H:%M'))
     report_lines.append("")
     
-    # 持仓股中的信号
-    report_lines.append("📊 **持仓股策略命中**")
-    report_lines.append("-" * 40)
+    # 板块表现
+    report_lines.append("📊 **板块表现**")
+    sector = __import__('sys').modules['core.sector_tracker'].get_sector_tracker()
+    sector_data = sector.calculate_sector_performance()
+    for name, perf in sorted(sector_data.items(), key=lambda x: -x[1]['avg_change'])[:5]:
+        emoji = "🔥" if perf['avg_change'] > 2 else "📈"
+        up_count = perf.get('up_count', 0)
+        total = perf.get('total', 0)
+        report_lines.append(f"{emoji} {name}: {perf['avg_change']:+.2f}% ({up_count}/{total}上涨)")
     
+    report_lines.append("")
+    
+    # 五策略信号
+    report_lines.append("⭐ **五策略信号**")
+    strategy_summary = [
+        ('💧 低吸型', result.get('dip', {})),
+        ('🚀 追涨型', result.get('chase', {})),
+        ('💎 潜力型', result.get('potential', {})),
+        ('🎯 抄底型', result.get('bottom', {})),
+        ('⭐ 多维优选', result.get('multi', {})),
+    ]
+    
+    for name, data in strategy_summary:
+        found = data.get('found', 0)
+        if found > 0:
+            report_lines.append(f"{name}: {found}个信号")
+            for signal in data.get('signals', [])[:2]:
+                pos_marker = " [持仓]" if signal['code'] in portfolio_codes else ""
+                report_lines.append(f"  • {signal['name']}({signal['code']}){pos_marker} {signal.get('change_pct', 0):+.2f}%")
+    
+    # 持仓股命中
+    report_lines.append("")
+    report_lines.append("📈 **持仓股监控**")
     hit_positions = []
     for strategy_key in ['dip', 'chase', 'potential', 'bottom', 'multi']:
-        strategy_name = {
-            'dip': '💧低吸', 'chase': '🚀追涨', 'potential': '💎潜力', 
-            'bottom': '🎯抄底', 'multi': '⭐优选'
-        }.get(strategy_key, strategy_key)
-        
         signals = result.get(strategy_key, {}).get('signals', [])
         for signal in signals:
             if signal['code'] in portfolio_codes:
@@ -59,45 +82,18 @@ def generate_scan_report(result, portfolio_info):
                 hit_positions.append({
                     'name': signal['name'],
                     'code': signal['code'],
-                    'strategy': strategy_name,
-                    'score': signal['score'],
                     'price': signal['price'],
-                    'change': signal.get('change_pct', 0),
-                    'cost': pos['cost_price'],
                     'pnl': pnl
                 })
     
     if hit_positions:
-        for hit in hit_positions:
+        for hit in hit_positions[:3]:
             emoji = "🟢" if hit['pnl'] >= 0 else "🔴"
-            report_lines.append(f"{emoji} **{hit['name']}({hit['code']})** [持仓]")
-            report_lines.append(f"   命中策略: {hit['strategy']} | 评分:{hit['score']}分")
-            report_lines.append(f"   现价:{hit['price']:.2f} ({hit['change']:+.2f}%) | 成本:{hit['cost']:.2f} | 盈亏:{hit['pnl']:+.2f}%")
-            report_lines.append("")
+            report_lines.append(f"{emoji} {hit['name']}({hit['code']}) 现价:{hit['price']:.2f} 盈亏:{hit['pnl']:+.2f}%")
     else:
         report_lines.append("暂无持仓股被策略选中")
-        report_lines.append("")
     
-    # 各策略信号汇总
-    report_lines.append("📈 **五策略信号汇总**")
-    report_lines.append("-" * 40)
-    
-    strategy_summary = [
-        ('💧 强势股低吸', result.get('dip', {})),
-        ('🚀 追涨型', result.get('chase', {})),
-        ('💎 潜力型', result.get('potential', {})),
-        ('🎯 抄底型', result.get('bottom', {})),
-        ('⭐ 多维度优选', result.get('multi', {})),
-    ]
-    
-    for name, data in strategy_summary:
-        found = data.get('found', 0)
-        added = data.get('added', 0)
-        report_lines.append(f"{name}: 发现{found}个 | 新增{added}只到自选")
-    
-    report_lines.append("")
-    report_lines.append("🏆 **重点标的详情**")
-    report_lines.append("-" * 40)
+    return "\n".join(report_lines)
     
     # 多维度优选详细展示
     multi_signals = result.get('multi', {}).get('signals', [])

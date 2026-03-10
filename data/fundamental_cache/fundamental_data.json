@@ -2,12 +2,12 @@
   "603019": {
     "data": {
       "name": "中科曙光",
-      "current": 84.19,
-      "change_pct": 0.0,
-      "volume": 0.0,
-      "volume_ratio": 1,
-      "high_20d": 0,
-      "low_20d": 0,
+      "current": 87.7,
+      "change_pct": 1.26,
+      "volume": 301921.0,
+      "volume_ratio": 0.7370009783684875,
+      "high_20d": 91.2,
+      "low_20d": 84.16,
       "main_force_flow": 0,
       "data_source": "腾讯/东财实时数据",
       "pe": 45.32,
@@ -15,17 +15,17 @@
       "roe": 12.56,
       "industry": "计算机设备"
     },
-    "timestamp": "2026-03-09T09:16:40.303343"
+    "timestamp": "2026-03-10T12:17:03.012077"
   },
   "601138": {
     "data": {
       "name": "工业富联",
-      "current": 53.8,
-      "change_pct": -0.98,
-      "volume": 0.0,
-      "volume_ratio": 1,
-      "high_20d": 0,
-      "low_20d": 0,
+      "current": 53.86,
+      "change_pct": 2.03,
+      "volume": 689445.0,
+      "volume_ratio": 0.4971676848540475,
+      "high_20d": 56.3,
+      "low_20d": 52.94,
       "main_force_flow": 0,
       "data_source": "腾讯/东财实时数据",
       "pe": 28.45,
@@ -33,17 +33,17 @@
       "roe": 15.82,
       "industry": "消费电子"
     },
-    "timestamp": "2026-03-09T09:16:37.674260"
+    "timestamp": "2026-03-10T12:17:01.815831"
   },
   "600276": {
     "data": {
       "name": "恒瑞医药",
-      "current": 55.5,
-      "change_pct": -0.11,
-      "volume": 0.0,
-      "volume_ratio": 1,
-      "high_20d": 0,
-      "low_20d": 0,
+      "current": 56.71,
+      "change_pct": 3.22,
+      "volume": 316882.0,
+      "volume_ratio": 0.6063267446804196,
+      "high_20d": 58.5,
+      "low_20d": 53.9,
       "main_force_flow": 0,
       "data_source": "腾讯/东财实时数据",
       "pe": 52.18,
@@ -51,17 +51,17 @@
       "roe": 18.23,
       "industry": "化学制药"
     },
-    "timestamp": "2026-03-09T09:16:38.296257"
+    "timestamp": "2026-03-10T12:17:02.331165"
   },
   "000099": {
     "data": {
       "name": "中信海直",
-      "current": 21.8,
-      "change_pct": 1.35,
-      "volume": 0.0,
-      "volume_ratio": 1,
-      "high_20d": 0,
-      "low_20d": 0,
+      "current": 21.22,
+      "change_pct": -1.44,
+      "volume": 171780.0,
+      "volume_ratio": 0.5796586971750666,
+      "high_20d": 21.14,
+      "low_20d": 20.04,
       "main_force_flow": 0,
       "data_source": "腾讯/东财实时数据",
       "pe": 38.65,
@@ -69,17 +69,17 @@
       "roe": 8.92,
       "industry": "航空运输"
     },
-    "timestamp": "2026-03-09T09:16:38.560426"
+    "timestamp": "2026-03-10T12:17:05.854900"
   },
   "002085": {
     "data": {
       "name": "万丰奥威",
-      "current": 16.61,
+      "current": 16.45,
       "change_pct": -0.84,
-      "volume": 0.0,
-      "volume_ratio": 1,
-      "high_20d": 0,
-      "low_20d": 0,
+      "volume": 389212.0,
+      "volume_ratio": 0.6045322366350773,
+      "high_20d": 16.41,
+      "low_20d": 15.72,
       "main_force_flow": 0,
       "data_source": "腾讯/东财实时数据",
       "pe": 42.35,
@@ -87,17 +87,17 @@
       "roe": 9.85,
       "industry": "汽车零部件"
     },
-    "timestamp": "2026-03-09T09:16:37.761937"
+    "timestamp": "2026-03-10T12:17:07.957824"
   },
   "300750": {
     "data": {
       "name": "宁德时代",
-      "current": 354.77,
-      "change_pct": 0.0,
-      "volume": 0.0,
-      "volume_ratio": 1,
-      "high_20d": 0,
-      "low_20d": 0,
+      "current": 378.98,
+      "change_pct": 6.01,
+      "volume": 377729.0,
+      "volume_ratio": 1.2687842574000014,
+      "high_20d": 368.03,
+      "low_20d": 342.02,
       "main_force_flow": 0,
       "data_source": "腾讯/东财实时数据",
       "pe": 25.68,
@@ -105,17 +105,17 @@
       "roe": 22.15,
       "industry": "电池"
     },
-    "timestamp": "2026-03-09T09:16:40.958189"
+    "timestamp": "2026-03-10T12:17:02.500607"
   },
   "002230": {
     "data": {
       "name": "科大讯飞",
-      "current": 52.53,
-      "change_pct": 0.0,
-      "volume": 0.0,
-      "volume_ratio": 1,
-      "high_20d": 0,
-      "low_20d": 0,
+      "current": 53.45,
+      "change_pct": -0.09,
+      "volume": 349160.0,
+      "volume_ratio": 0.7550868233067421,
+      "high_20d": 56.81,
+      "low_20d": 52.51,
       "main_force_flow": 0,
       "data_source": "腾讯/东财实时数据",
       "pe": 68.52,
@@ -123,17 +123,17 @@
       "roe": 8.25,
       "industry": "软件开发"
     },
-    "timestamp": "2026-03-09T09:16:40.520772"
+    "timestamp": "2026-03-10T12:17:07.812188"
   },
   "600584": {
     "data": {
       "name": "长电科技",
-      "current": 46.0,
-      "change_pct": -2.21,
-      "volume": 0.0,
-      "volume_ratio": 1,
-      "high_20d": 0,
-      "low_20d": 0,
+      "current": 45.6,
+      "change_pct": 1.33,
+      "volume": 513771.0,
+      "volume_ratio": 0.45098037150310294,
+      "high_20d": 48.22,
+      "low_20d": 44.68,
       "main_force_flow": 0,
       "data_source": "腾讯/东财实时数据",
       "pe": 72.35,
@@ -141,17 +141,17 @@
       "roe": 7.85,
       "industry": "半导体"
     },
-    "timestamp": "2026-03-09T09:16:38.935107"
+    "timestamp": "2026-03-10T12:17:12.353739"
   },
   "300308": {
     "data": {
       "name": "中际旭创",
-      "current": 519.86,
-      "change_pct": -4.7,
-      "volume": 23122.0,
-      "volume_ratio": 1,
-      "high_20d": 0,
-      "low_20d": 0,
+      "current": 543.84,
+      "change_pct": 3.39,
+      "volume": 185298.0,
+      "volume_ratio": 0.5740530191549278,
+      "high_20d": 576.0,
+      "low_20d": 528.3,
       "main_force_flow": 0,
       "data_source": "腾讯/东财实时数据",
       "pe": 55.28,
@@ -159,17 +159,17 @@
       "roe": 16.52,
       "industry": "通信设备"
     },
-    "timestamp": "2026-03-09T09:30:59.414354"
+    "timestamp": "2026-03-10T12:17:10.321359"
   },
   "002050": {
     "data": {
       "name": "三花智控",
-      "current": 47.0,
-      "change_pct": -1.49,
-      "volume": 0.0,
-      "volume_ratio": 1,
-      "high_20d": 0,
-      "low_20d": 0,
+      "current": 48.41,
+      "change_pct": 3.02,
+      "volume": 693042.0,
+      "volume_ratio": 0.7242455396807117,
+      "high_20d": 52.36,
+      "low_20d": 47.28,
       "main_force_flow": 0,
       "data_source": "腾讯/东财实时数据",
       "pe": 35.42,
@@ -177,17 +177,17 @@
       "roe": 14.25,
       "industry": "家电零部件"
     },
-    "timestamp": "2026-03-09T09:16:37.579648"
+    "timestamp": "2026-03-10T12:17:14.978819"
   },
   "002371": {
     "data": {
       "name": "北方华创",
-      "current": 459.0,
-      "change_pct": -1.37,
-      "volume": 0.0,
-      "volume_ratio": 1,
-      "high_20d": 0,
-      "low_20d": 0,
+      "current": 454.25,
+      "change_pct": 0.36,
+      "volume": 35633.0,
+      "volume_ratio": 0.49114009890891447,
+      "high_20d": 483.3,
+      "low_20d": 453.55,
       "main_force_flow": 0,
       "data_source": "腾讯/东财实时数据",
       "pe": 48.95,
@@ -195,17 +195,17 @@
       "roe": 11.85,
       "industry": "半导体设备"
     },
-    "timestamp": "2026-03-09T09:16:37.128858"
+    "timestamp": "2026-03-10T12:17:02.674497"
   },
   "300502": {
     "data": {
       "name": "新易盛",
-      "current": 385.0,
-      "change_pct": -4.23,
-      "volume": 0.0,
-      "volume_ratio": 1,
-      "high_20d": 0,
-      "low_20d": 0,
+      "current": 388.77,
+      "change_pct": 1.24,
+      "volume": 273643.0,
+      "volume_ratio": 0.5747983795585418,
+      "high_20d": 411.49,
+      "low_20d": 372.74,
       "main_force_flow": 0,
       "data_source": "腾讯/东财实时数据",
       "pe": 58.65,
@@ -213,17 +213,17 @@
       "roe": 18.92,
       "industry": "通信设备"
     },
-    "timestamp": "2026-03-09T09:16:38.208363"
+    "timestamp": "2026-03-10T12:17:11.949437"
   },
   "603127": {
     "data": {
       "name": "昭衍新药",
-      "current": 33.0,
-      "change_pct": -1.08,
-      "volume": 0.0,
-      "volume_ratio": 1,
-      "high_20d": 0,
-      "low_20d": 0,
+      "current": 34.45,
+      "change_pct": 3.83,
+      "volume": 98601.0,
+      "volume_ratio": 0.6508514449943695,
+      "high_20d": 37.29,
+      "low_20d": 32.5,
       "main_force_flow": 0,
       "data_source": "腾讯/东财实时数据",
       "pe": 28.52,
@@ -231,7 +231,7 @@
       "roe": 9.25,
       "industry": "医疗服务"
     },
-    "timestamp": "2026-03-09T09:16:39.374986"
+    "timestamp": "2026-03-10T12:17:05.341094"
   },
   "002714": {
     "data": {
@@ -246,12 +246,12 @@
   "600733": {
     "data": {
       "name": "北汽蓝谷",
-      "current": 7.57,
-      "change_pct": -2.57,
-      "volume": 368587.0,
-      "volume_ratio": 1,
-      "high_20d": 0,
-      "low_20d": 0,
+      "current": 7.81,
+      "change_pct": 0.9,
+      "volume": 394342.0,
+      "volume_ratio": 0.454045223752637,
+      "high_20d": 8.21,
+      "low_20d": 7.76,
       "main_force_flow": 0,
       "data_source": "腾讯/东财实时数据",
       "pe": -15.25,
@@ -259,17 +259,17 @@
       "roe": -8.25,
       "industry": "汽车整车"
     },
-    "timestamp": "2026-03-09T10:00:17.812915"
+    "timestamp": "2026-03-10T12:17:06.372477"
   },
   "603160": {
     "data": {
       "name": "汇顶科技",
-      "current": 72.14,
-      "change_pct": -0.81,
-      "volume": 0.0,
-      "volume_ratio": 1,
-      "high_20d": 0,
-      "low_20d": 0,
+      "current": 71.81,
+      "change_pct": 1.11,
+      "volume": 29953.0,
+      "volume_ratio": 0.573175398981974,
+      "high_20d": 78.57,
+      "low_20d": 71.36,
       "main_force_flow": 0,
       "data_source": "腾讯/东财实时数据",
       "pe": 45.85,
@@ -277,17 +277,17 @@
       "roe": 12.52,
       "industry": "半导体"
     },
-    "timestamp": "2026-03-09T09:16:39.286902"
+    "timestamp": "2026-03-10T12:17:01.989208"
   },
   "000938": {
     "data": {
       "name": "紫光股份",
-      "current": 24.0,
-      "change_pct": -0.54,
-      "volume": 0.0,
-      "volume_ratio": 1,
-      "high_20d": 0,
-      "low_20d": 0,
+      "current": 24.68,
+      "change_pct": 1.73,
+      "volume": 385141.0,
+      "volume_ratio": 0.7292693502790091,
+      "high_20d": 25.36,
+      "low_20d": 24.06,
       "main_force_flow": 0,
       "data_source": "腾讯/东财实时数据",
       "pe": 38.52,
@@ -295,17 +295,17 @@
       "roe": 10.85,
       "industry": "计算机设备"
     },
-    "timestamp": "2026-03-09T09:16:38.472657"
+    "timestamp": "2026-03-10T12:17:04.804218"
   },
   "002709": {
     "data": {
       "name": "天赐材料",
-      "current": 41.01,
-      "change_pct": -2.12,
-      "volume": 0.0,
-      "volume_ratio": 1,
-      "high_20d": 0,
-      "low_20d": 0,
+      "current": 45.17,
+      "change_pct": 4.17,
+      "volume": 933709.0,
+      "volume_ratio": 1.6494264955015272,
+      "high_20d": 44.63,
+      "low_20d": 40.45,
       "main_force_flow": 0,
       "data_source": "腾讯/东财实时数据",
       "pe": 18.52,
@@ -313,17 +313,17 @@
       "roe": 15.25,
       "industry": "电池"
     },
-    "timestamp": "2026-03-09T09:16:37.404508"
+    "timestamp": "2026-03-10T12:19:29.014993"
   },
   "300124": {
     "data": {
       "name": "汇川技术",
-      "current": 70.9,
-      "change_pct": -0.8,
-      "volume": 0.0,
-      "volume_ratio": 1,
-      "high_20d": 0,
-      "low_20d": 0,
+      "current": 71.03,
+      "change_pct": 0.34,
+      "volume": 157602.0,
+      "volume_ratio": 0.5138563385461702,
+      "high_20d": 76.53,
+      "low_20d": 69.02,
       "main_force_flow": 0,
       "data_source": "腾讯/东财实时数据",
       "pe": 32.85,
@@ -331,17 +331,17 @@
       "roe": 19.85,
       "industry": "自动化设备"
     },
-    "timestamp": "2026-03-09T09:16:39.463435"
+    "timestamp": "2026-03-10T12:17:04.117625"
   },
   "002896": {
     "data": {
       "name": "中大力德",
-      "current": 77.2,
-      "change_pct": -0.62,
-      "volume": 0.0,
-      "volume_ratio": 1,
-      "high_20d": 0,
-      "low_20d": 0,
+      "current": 78.62,
+      "change_pct": 3.88,
+      "volume": 39942.0,
+      "volume_ratio": 1.0602738416942294,
+      "high_20d": 86.01,
+      "low_20d": 76.19,
       "main_force_flow": 0,
       "data_source": "腾讯/东财实时数据",
       "pe": 65.25,
@@ -349,17 +349,17 @@
       "roe": 8.52,
       "industry": "机械零部件"
     },
-    "timestamp": "2026-03-09T09:16:39.650159"
+    "timestamp": "2026-03-10T12:17:06.195354"
   },
   "002281": {
     "data": {
       "name": "光迅科技",
-      "current": 79.0,
-      "change_pct": -1.39,
-      "volume": 0.0,
-      "volume_ratio": 1,
-      "high_20d": 0,
-      "low_20d": 0,
+      "current": 80.88,
+      "change_pct": 3.26,
+      "volume": 353356.0,
+      "volume_ratio": 0.526923727314779,
+      "high_20d": 78.99,
+      "low_20d": 68.1,
       "main_force_flow": 0,
       "data_source": "腾讯/东财实时数据",
       "pe": 45.25,
@@ -367,17 +367,17 @@
       "roe": 11.25,
       "industry": "通信设备"
     },
-    "timestamp": "2026-03-09T09:16:37.310257"
+    "timestamp": "2026-03-10T12:17:06.025067"
   },
   "300760": {
     "data": {
       "name": "迈瑞医疗",
-      "current": 180.0,
-      "change_pct": -0.76,
-      "volume": 0.0,
-      "volume_ratio": 1,
-      "high_20d": 0,
-      "low_20d": 0,
+      "current": 179.74,
+      "change_pct": 0.54,
+      "volume": 24366.0,
+      "volume_ratio": 0.3383602732877854,
+      "high_20d": 191.25,
+      "low_20d": 178.3,
       "main_force_flow": 0,
       "data_source": "腾讯/东财实时数据",
       "pe": 38.25,
@@ -385,17 +385,17 @@
       "roe": 22.35,
       "industry": "医疗器械"
     },
-    "timestamp": "2026-03-09T09:16:37.941044"
+    "timestamp": "2026-03-10T12:17:02.160516"
   },
   "300394": {
     "data": {
       "name": "天孚通信",
-      "current": 310.0,
-      "change_pct": -3.99,
-      "volume": 0.0,
-      "volume_ratio": 1,
-      "high_20d": 0,
-      "low_20d": 0,
+      "current": 332.26,
+      "change_pct": 8.24,
+      "volume": 259167.0,
+      "volume_ratio": 0.7311481107627309,
+      "high_20d": 346.61,
+      "low_20d": 261.44,
       "main_force_flow": 0,
       "data_source": "腾讯/东财实时数据",
       "pe": 52.35,
@@ -403,17 +403,17 @@
       "roe": 16.25,
       "industry": "通信设备"
     },
-    "timestamp": "2026-03-09T09:16:38.384995"
+    "timestamp": "2026-03-10T12:17:04.625472"
   },
   "300769": {
     "data": {
       "name": "德方纳米",
-      "current": 33.85,
-      "change_pct": -20.0,
-      "volume": 0.0,
-      "volume_ratio": 1,
-      "high_20d": 0,
-      "low_20d": 0,
+      "current": 42.69,
+      "change_pct": 1.09,
+      "volume": 87850.0,
+      "volume_ratio": 0.5511015758305732,
+      "high_20d": 42.41,
+      "low_20d": 40.25,
       "main_force_flow": 0,
       "data_source": "腾讯/东财实时数据",
       "pe": 38.55,
@@ -421,31 +421,31 @@
       "roe": 11.85,
       "industry": "电池"
     },
-    "timestamp": "2026-03-09T09:16:37.220946"
+    "timestamp": "2026-03-10T12:17:03.691590"
   },
   "002151": {
     "data": {
       "name": "北斗星通",
-      "current": 43.0,
-      "change_pct": 2.82,
-      "volume": 0.0,
-      "volume_ratio": 1,
-      "high_20d": 0,
-      "low_20d": 0,
+      "current": 43.8,
+      "change_pct": -2.32,
+      "volume": 403808.0,
+      "volume_ratio": 0.952499116632362,
+      "high_20d": 44.37,
+      "low_20d": 42.17,
       "main_force_flow": 0,
       "data_source": "腾讯/东财实时数据"
     },
-    "timestamp": "2026-03-09T09:16:37.853379"
+    "timestamp": "2026-03-10T12:17:03.520633"
   },
   "300418": {
     "data": {
       "name": "昆仑万维",
-      "current": 53.21,
-      "change_pct": 0.0,
-      "volume": 0.0,
-      "volume_ratio": 1,
-      "high_20d": 0,
-      "low_20d": 0,
+      "current": 56.53,
+      "change_pct": 2.74,
+      "volume": 645752.0,
+      "volume_ratio": 0.9814835699475297,
+      "high_20d": 59.98,
+      "low_20d": 53.25,
       "main_force_flow": 0,
       "data_source": "腾讯/东财实时数据",
       "pe": 55.25,
@@ -453,17 +453,17 @@
       "roe": 9.85,
       "industry": "游戏"
     },
-    "timestamp": "2026-03-09T09:16:39.023015"
+    "timestamp": "2026-03-10T12:17:12.839875"
   },
   "002594": {
     "data": {
       "name": "比亚迪",
-      "current": 93.64,
-      "change_pct": 0.02,
-      "volume": 0.0,
-      "volume_ratio": 1,
-      "high_20d": 0,
-      "low_20d": 0,
+      "current": 96.77,
+      "change_pct": -0.77,
+      "volume": 338537.0,
+      "volume_ratio": 0.4555005127689009,
+      "high_20d": 96.08,
+      "low_20d": 87.4,
       "main_force_flow": 0,
       "data_source": "腾讯/东财实时数据",
       "pe": 22.35,
@@ -471,17 +471,17 @@
       "roe": 18.25,
       "industry": "汽车整车"
     },
-    "timestamp": "2026-03-09T09:16:37.492193"
+    "timestamp": "2026-03-10T12:17:02.843331"
   },
   "688981": {
     "data": {
       "name": "中芯国际",
-      "current": 106.0,
-      "change_pct": -0.47,
-      "volume": 0.0,
-      "volume_ratio": 1,
-      "high_20d": 0,
-      "low_20d": 0,
+      "current": 106.15,
+      "change_pct": 0.96,
+      "volume": 17246868.0,
+      "volume_ratio": 0.44193018554154506,
+      "high_20d": 115.85,
+      "low_20d": 105.79,
       "main_force_flow": 0,
       "data_source": "腾讯/东财实时数据",
       "pe": 85.25,
@@ -489,17 +489,17 @@
       "roe": 4.85,
       "industry": "半导体"
     },
-    "timestamp": "2026-03-09T09:16:39.551619"
+    "timestamp": "2026-03-10T12:17:06.712141"
   },
   "300014": {
     "data": {
       "name": "亿纬锂能",
-      "current": 60.0,
-      "change_pct": -0.5,
-      "volume": 0.0,
-      "volume_ratio": 1,
-      "high_20d": 0,
-      "low_20d": 0,
+      "current": 63.12,
+      "change_pct": 1.35,
+      "volume": 291406.0,
+      "volume_ratio": 0.6490805253122828,
+      "high_20d": 64.22,
+      "low_20d": 60.75,
       "main_force_flow": 0,
       "data_source": "腾讯/东财实时数据",
       "pe": 42.85,
@@ -507,17 +507,17 @@
       "roe": 12.15,
       "industry": "电池"
     },
-    "timestamp": "2026-03-09T09:16:41.317579"
+    "timestamp": "2026-03-10T12:17:04.993082"
   },
   "002156": {
     "data": {
       "name": "通富微电",
-      "current": 47.68,
-      "change_pct": -0.52,
-      "volume": 0.0,
-      "volume_ratio": 1,
-      "high_20d": 0,
-      "low_20d": 0,
+      "current": 47.39,
+      "change_pct": 1.37,
+      "volume": 400778.0,
+      "volume_ratio": 0.46090244777014705,
+      "high_20d": 50.55,
+      "low_20d": 47.0,
       "main_force_flow": 0,
       "data_source": "腾讯/东财实时数据",
       "pe": 42.85,
@@ -525,17 +525,17 @@
       "roe": 6.25,
       "industry": "半导体"
     },
-    "timestamp": "2026-03-09T09:16:38.120484"
+    "timestamp": "2026-03-10T12:17:12.999528"
   },
   "603659": {
     "data": {
       "name": "璞泰来",
-      "current": 26.33,
-      "change_pct": -1.05,
-      "volume": 156656.0,
-      "volume_ratio": 1,
-      "high_20d": 0,
-      "low_20d": 0,
+      "current": 28.29,
+      "change_pct": 2.13,
+      "volume": 253826.0,
+      "volume_ratio": 0.5241878192716146,
+      "high_20d": 29.03,
+      "low_20d": 27.65,
       "main_force_flow": 0,
       "data_source": "腾讯/东财实时数据",
       "pe": 32.85,
@@ -543,17 +543,17 @@
       "roe": 13.25,
       "industry": "电池材料"
     },
-    "timestamp": "2026-03-09T09:43:14.359554"
+    "timestamp": "2026-03-10T12:17:03.182904"
   },
   "002466": {
     "data": {
       "name": "天齐锂业",
-      "current": 51.58,
-      "change_pct": -0.79,
-      "volume": 0.0,
-      "volume_ratio": 1,
-      "high_20d": 0,
-      "low_20d": 0,
+      "current": 53.74,
+      "change_pct": 1.22,
+      "volume": 170131.0,
+      "volume_ratio": 0.4788039119116302,
+      "high_20d": 55.91,
+      "low_20d": 50.53,
       "main_force_flow": 0,
       "data_source": "腾讯/东财实时数据",
       "pe": 18.25,
@@ -561,17 +561,17 @@
       "roe": 15.25,
       "industry": "能源金属"
     },
-    "timestamp": "2026-03-09T09:16:41.404638"
+    "timestamp": "2026-03-10T12:17:05.164319"
   },
   "300900": {
     "data": {
       "name": "广联航空",
-      "current": 38.06,
-      "change_pct": -2.41,
-      "volume": 13693.0,
-      "volume_ratio": 1,
-      "high_20d": 0,
-      "low_20d": 0,
+      "current": 43.2,
+      "change_pct": 6.82,
+      "volume": 499805.0,
+      "volume_ratio": 1.498060154396364,
+      "high_20d": 41.21,
+      "low_20d": 35.27,
       "main_force_flow": 0,
       "data_source": "腾讯/东财实时数据",
       "pe": 45.25,
@@ -579,17 +579,17 @@
       "roe": 9.25,
       "industry": "航空装备"
     },
-    "timestamp": "2026-03-09T09:30:59.844892"
+    "timestamp": "2026-03-10T12:17:05.685283"
   },
   "601012": {
     "data": {
       "name": "隆基绿能",
-      "current": 18.01,
-      "change_pct": 0.06,
-      "volume": 0.0,
-      "volume_ratio": 1,
-      "high_20d": 0,
-      "low_20d": 0,
+      "current": 18.25,
+      "change_pct": -0.76,
+      "volume": 908487.0,
+      "volume_ratio": 0.5474626475684538,
+      "high_20d": 18.77,
+      "low_20d": 18.0,
       "main_force_flow": 0,
       "data_source": "腾讯/东财实时数据",
       "pe": 15.25,
@@ -597,17 +597,17 @@
       "roe": 18.25,
       "industry": "光伏设备"
     },
-    "timestamp": "2026-03-09T09:16:41.091737"
+    "timestamp": "2026-03-10T12:17:14.414452"
   },
   "002097": {
     "data": {
       "name": "山河智能",
-      "current": 11.09,
-      "change_pct": -2.55,
-      "volume": 58940.0,
-      "volume_ratio": 1,
-      "high_20d": 0,
-      "low_20d": 0,
+      "current": 11.26,
+      "change_pct": 1.53,
+      "volume": 88728.0,
+      "volume_ratio": 0.3845530407376234,
+      "high_20d": 11.74,
+      "low_20d": 10.98,
       "main_force_flow": 0,
       "data_source": "腾讯/东财实时数据",
       "pe": 35.85,
@@ -615,17 +615,17 @@
       "roe": 8.25,
       "industry": "工程机械"
     },
-    "timestamp": "2026-03-09T09:43:13.852976"
+    "timestamp": "2026-03-10T12:17:11.789553"
   },
   "300450": {
     "data": {
       "name": "先导智能",
-      "current": 48.49,
-      "change_pct": -3.29,
-      "volume": 98161.0,
-      "volume_ratio": 1,
-      "high_20d": 0,
-      "low_20d": 0,
+      "current": 50.7,
+      "change_pct": 2.11,
+      "volume": 280847.0,
+      "volume_ratio": 0.6647190753809188,
+      "high_20d": 58.09,
+      "low_20d": 49.91,
       "main_force_flow": 0,
       "data_source": "腾讯/东财实时数据",
       "pe": 35.25,
@@ -633,17 +633,17 @@
       "roe": 12.55,
       "industry": "专用设备"
     },
-    "timestamp": "2026-03-09T09:43:14.743644"
+    "timestamp": "2026-03-10T12:17:03.351790"
   },
   "600460": {
     "data": {
       "name": "士兰微",
-      "current": 28.4,
-      "change_pct": -1.66,
-      "volume": 0.0,
-      "volume_ratio": 1,
-      "high_20d": 0,
-      "low_20d": 0,
+      "current": 29.08,
+      "change_pct": 1.96,
+      "volume": 270934.0,
+      "volume_ratio": 0.5784538155440008,
+      "high_20d": 32.43,
+      "low_20d": 28.68,
       "main_force_flow": 0,
       "data_source": "腾讯/东财实时数据",
       "pe": 65.85,
@@ -651,17 +651,17 @@
       "roe": 8.25,
       "industry": "半导体"
     },
-    "timestamp": "2026-03-09T09:16:40.826756"
+    "timestamp": "2026-03-10T12:17:13.183848"
   },
   "600756": {
     "data": {
       "name": "浪潮软件",
-      "current": 15.88,
-      "change_pct": -1.31,
-      "volume": 0.0,
-      "volume_ratio": 1,
-      "high_20d": 0,
-      "low_20d": 0,
+      "current": 16.33,
+      "change_pct": 0.37,
+      "volume": 62200.0,
+      "volume_ratio": 0.7307742917833713,
+      "high_20d": 17.52,
+      "low_20d": 16.05,
       "main_force_flow": 0,
       "data_source": "腾讯/东财实时数据",
       "pe": 42.85,
@@ -669,7 +669,7 @@
       "roe": 8.25,
       "industry": "软件开发"
     },
-    "timestamp": "2026-03-09T09:16:38.841022"
+    "timestamp": "2026-03-10T12:17:08.100998"
   },
   "600438": {
     "data": {
@@ -677,9 +677,9 @@
       "current": 18.16,
       "change_pct": 0.0,
       "volume": 0.0,
-      "volume_ratio": 1,
-      "high_20d": 0,
-      "low_20d": 0,
+      "volume_ratio": 0.7312657081320387,
+      "high_20d": 19.55,
+      "low_20d": 18.36,
       "main_force_flow": 0,
       "data_source": "腾讯/东财实时数据",
       "pe": 12.85,
@@ -687,17 +687,17 @@
       "roe": 22.85,
       "industry": "光伏设备"
     },
-    "timestamp": "2026-03-09T09:16:41.178340"
+    "timestamp": "2026-03-10T12:17:14.573985"
   },
   "002747": {
     "data": {
       "name": "埃斯顿",
-      "current": 22.2,
-      "change_pct": -0.13,
-      "volume": 0.0,
-      "volume_ratio": 1,
-      "high_20d": 0,
-      "low_20d": 0,
+      "current": 22.24,
+      "change_pct": 1.65,
+      "volume": 100693.0,
+      "volume_ratio": 0.5892152651887083,
+      "high_20d": 24.21,
+      "low_20d": 21.9,
       "main_force_flow": 0,
       "data_source": "腾讯/东财实时数据",
       "pe": 38.25,
@@ -705,17 +705,17 @@
       "roe": 11.25,
       "industry": "自动化设备"
     },
-    "timestamp": "2026-03-09T09:16:38.753511"
+    "timestamp": "2026-03-10T12:17:05.512133"
   },
   "600196": {
     "data": {
       "name": "复星医药",
-      "current": 25.91,
-      "change_pct": 0.0,
-      "volume": 0.0,
-      "volume_ratio": 1,
-      "high_20d": 0,
-      "low_20d": 0,
+      "current": 26.14,
+      "change_pct": 1.63,
+      "volume": 78932.0,
+      "volume_ratio": 0.5052534012364408,
+      "high_20d": 27.04,
+      "low_20d": 25.4,
       "main_force_flow": 0,
       "data_source": "腾讯/东财实时数据",
       "pe": 18.25,
@@ -723,17 +723,17 @@
       "roe": 12.85,
       "industry": "生物制品"
     },
-    "timestamp": "2026-03-09T09:16:39.110768"
+    "timestamp": "2026-03-10T12:17:12.515936"
   },
   "000988": {
     "data": {
       "name": "华工科技",
-      "current": 113.0,
-      "change_pct": -1.55,
-      "volume": 0.0,
-      "volume_ratio": 1,
-      "high_20d": 0,
-      "low_20d": 0,
+      "current": 118.4,
+      "change_pct": -0.17,
+      "volume": 664310.0,
+      "volume_ratio": 0.4957371574442884,
+      "high_20d": 116.55,
+      "low_20d": 75.78,
       "main_force_flow": 0,
       "data_source": "腾讯/东财实时数据",
       "pe": 38.25,
@@ -741,17 +741,17 @@
       "roe": 12.25,
       "industry": "通信设备"
     },
-    "timestamp": "2026-03-09T09:16:38.653625"
+    "timestamp": "2026-03-10T12:20:44.900074"
   },
   "002074": {
     "data": {
       "name": "国轩高科",
-      "current": 35.21,
-      "change_pct": -3.0,
-      "volume": 96031.0,
-      "volume_ratio": 1,
-      "high_20d": 0,
-      "low_20d": 0,
+      "current": 38.06,
+      "change_pct": 0.87,
+      "volume": 313667.0,
+      "volume_ratio": 0.8563300010210427,
+      "high_20d": 37.83,
+      "low_20d": 36.57,
       "main_force_flow": 0,
       "data_source": "腾讯/东财实时数据",
       "pe": 25.35,
@@ -759,17 +759,17 @@
       "roe": 15.25,
       "industry": "电池"
     },
-    "timestamp": "2026-03-09T09:43:14.575079"
+    "timestamp": "2026-03-10T12:19:29.357346"
   },
   "000538": {
     "data": {
       "name": "云南白药",
-      "current": 56.3,
-      "change_pct": 0.27,
-      "volume": 28551.0,
-      "volume_ratio": 1,
-      "high_20d": 0,
-      "low_20d": 0,
+      "current": 56.36,
+      "change_pct": 0.25,
+      "volume": 34544.0,
+      "volume_ratio": 0.4342688182316469,
+      "high_20d": 57.1,
+      "low_20d": 55.83,
       "main_force_flow": 0,
       "data_source": "腾讯/东财实时数据",
       "pe": 22.35,
@@ -777,17 +777,17 @@
       "roe": 15.85,
       "industry": "中药"
     },
-    "timestamp": "2026-03-09T10:00:18.265008"
+    "timestamp": "2026-03-10T12:17:06.542503"
   },
   "688169": {
     "data": {
       "name": "石头科技",
-      "current": 133.03,
-      "change_pct": -1.19,
-      "volume": 0.0,
-      "volume_ratio": 1,
-      "high_20d": 0,
-      "low_20d": 0,
+      "current": 133.33,
+      "change_pct": 1.62,
+      "volume": 1295923.0,
+      "volume_ratio": 0.420402787329847,
+      "high_20d": 151.6,
+      "low_20d": 133.03,
       "main_force_flow": 0,
       "data_source": "腾讯/东财实时数据",
       "pe": 42.15,
@@ -795,17 +795,17 @@
       "roe": 14.25,
       "industry": "消费电子"
     },
-    "timestamp": "2026-03-09T09:16:41.718351"
+    "timestamp": "2026-03-10T12:17:15.387838"
   },
   "603259": {
     "data": {
       "name": "药明康德",
-      "current": 92.99,
-      "change_pct": -0.33,
-      "volume": 0.0,
-      "volume_ratio": 1,
-      "high_20d": 0,
-      "low_20d": 0,
+      "current": 94.17,
+      "change_pct": 3.37,
+      "volume": 215538.0,
+      "volume_ratio": 0.7008194402626682,
+      "high_20d": 102.41,
+      "low_20d": 91.78,
       "main_force_flow": 0,
       "data_source": "腾讯/东财实时数据",
       "pe": 25.85,
@@ -813,17 +813,17 @@
       "roe": 16.25,
       "industry": "医疗服务"
     },
-    "timestamp": "2026-03-09T09:16:39.737992"
+    "timestamp": "2026-03-10T12:17:03.944950"
   },
   "300775": {
     "data": {
       "name": "三角防务",
-      "current": 40.11,
-      "change_pct": -2.41,
-      "volume": 0.0,
-      "volume_ratio": 1,
-      "high_20d": 0,
-      "low_20d": 0,
+      "current": 39.6,
+      "change_pct": 0.23,
+      "volume": 181511.0,
+      "volume_ratio": 0.4324210873385249,
+      "high_20d": 46.0,
+      "low_20d": 39.8,
       "main_force_flow": 0,
       "data_source": "腾讯/东财实时数据",
       "pe": 42.25,
@@ -831,7 +831,7 @@
       "roe": 11.25,
       "industry": "航空装备"
     },
-    "timestamp": "2026-03-09T09:16:39.198655"
+    "timestamp": "2026-03-10T12:19:35.139605"
   },
   "301252": {
     "data": {
@@ -1022,12 +1022,12 @@
   "300073": {
     "data": {
       "name": "当升科技",
-      "current": 52.2,
-      "change_pct": -0.61,
-      "volume": 0.0,
-      "volume_ratio": 1,
-      "high_20d": 0,
-      "low_20d": 0,
+      "current": 53.66,
+      "change_pct": 0.9,
+      "volume": 68910.0,
+      "volume_ratio": 0.5364825244184798,
+      "high_20d": 57.02,
+      "low_20d": 52.8,
       "main_force_flow": 0,
       "data_source": "腾讯/东财实时数据",
       "pe": 28.55,
@@ -1035,17 +1035,17 @@
       "roe": 14.85,
       "industry": "电池"
     },
-    "timestamp": "2026-03-09T09:16:38.032645"
+    "timestamp": "2026-03-10T12:17:04.286810"
   },
   "603486": {
     "data": {
       "name": "科沃斯",
-      "current": 64.74,
-      "change_pct": -0.17,
-      "volume": 0.0,
-      "volume_ratio": 1,
-      "high_20d": 0,
-      "low_20d": 0,
+      "current": 64.51,
+      "change_pct": 2.15,
+      "volume": 30815.0,
+      "volume_ratio": 0.5187116626379471,
+      "high_20d": 72.07,
+      "low_20d": 64.0,
       "main_force_flow": 0,
       "data_source": "腾讯/东财实时数据",
       "pe": 35.85,
@@ -1053,6 +1053,6 @@
       "roe": 18.52,
       "industry": "家电"
     },
-    "timestamp": "2026-03-09T09:16:41.632306"
+    "timestamp": "2026-03-10T12:17:12.111228"
   }
 }
