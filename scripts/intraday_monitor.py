@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """
-A股盘中监控脚本 - Intraday Monitor
+A股盘中监控脚本 - Intraday Monitor (并行优化版)
 使用多数据源获取真实数据，监控持仓+自选股
 交易时间: 9:00-15:00
 新增：五策略选股（低吸+追涨+潜力+抄底+多维度优选）、板块跟踪、重点监控
+优化：并行数据获取，减少重复计算
 """
 
 import sys
@@ -45,9 +46,29 @@ def should_run_full_scan():
     # 9:00, 9:30, 10:00, 10:30, 11:00, 11:30, 13:00, 13:30, 14:00, 14:30
     return minute in [540, 570, 600, 630, 660, 690, 780, 810, 840, 870]
 
+def print_strategy_items(items, stock_data, strategy_name, strategy_emoji, status_func):
+    """统一打印策略监控项"""
+    if not items:
+        return
+    
+    print(f"\n{'='*60}")
+    print(f"{strategy_emoji} 重点监控-{strategy_name}")
+    print("="*60)
+    
+    for item in sorted(items, key=lambda x: x.priority, reverse=True)[:5]:
+        code = item.code
+        if code in stock_data:
+            data = stock_data[code]
+            current = data['current']
+            change = data['change_pct']
+            status = status_func(change)
+            print(f"{strategy_emoji} {item.name}({code}): {current:.2f} ({change:+.2f}%)")
+            print(f"   {status} | {item.notes[:50] if item.notes else ''}")
+
 def main():
     """盘中监控主函数"""
-    print(f"[{datetime.now().strftime('%H:%M:%S')}] 执行A股盘中监控...")
+    start_time = datetime.now()
+    print(f"[{start_time.strftime('%H:%M:%S')}] 执行A股盘中监控...")
     
     # 检查是否在交易时间
     if not is_trading_time():
@@ -70,43 +91,7 @@ def main():
                 emoji = "🟢" if data.get('change_pct', 0) >= 0 else "🔴"
                 print(f"{emoji} {name}: {data.get('current', 0):.2f} ({data.get('change_pct', 0):+.2f}%)")
         
-        # ===== 2. 板块轮动（每30分钟扫描） =====
-        scan_results = None
-        if should_run_full_scan():
-            print("\n" + "="*60)
-            print("🔥 板块轮动扫描")
-            print("="*60)
-            sector_tracker = get_sector_tracker()
-            sector_result = sector_tracker.run_sector_scan()
-            print(sector_tracker.get_sector_summary())
-            
-            # ===== 3. 三策略选股扫描（每30分钟） =====
-            print("\n" + "="*60)
-            print("✨ 三策略选股扫描")
-            print("="*60)
-            auto_manager = get_auto_manager()
-            scan_results = auto_manager.run_full_scan()
-        
-        # ===== 4. 智能调仓分析（每30分钟，全量扫描时）=====
-        rebalance_report = None
-        if should_run_full_scan() and positions:
-            print("\n" + "="*60)
-            print("🤖 智能调仓分析")
-            print("="*60)
-            try:
-                advisor = SmartRebalanceAdvisor()
-                analysis = advisor.generate_full_analysis()
-                rebalance_report = advisor.generate_comprehensive_report(analysis)
-                # 只显示核心建议
-                print(f"  已分析 {len(analysis['health_reports'])} 只持仓股")
-                print(f"  发现 {len(analysis['opportunities'])} 个换仓机会")
-                if analysis['recommendations']:
-                    print("\n  核心建议:")
-                    for rec in analysis['recommendations'][:3]:
-                        print(f"    • {rec['title']}")
-                        print(f"      建议: {rec['action'][:50]}")
-            except Exception as e:
-                print(f"  调仓分析跳过: {e}")
+        # ===== 2. 加载账户数据 =====
         portfolio = load_portfolio()
         positions = portfolio.get('positions', [])
         cash = portfolio.get('cash', 0)
@@ -123,189 +108,147 @@ def main():
         print(f"💰 持仓: {len(positions)}只 | 现金: {cash:,.0f}元")
         print(f"📋 自选股: {len(watchlist_codes)}只 | 🔍 监控总数: {len(all_codes)}只")
         
+        # ===== 3. 并行获取所有股票数据（核心优化）=====
+        stock_data = {}
         if all_codes:
-            stock_data = data_fetcher.get_stock_data(all_codes[:40])
+            print(f"\n📡 正在并行获取 {len(all_codes)} 只股票数据...")
+            stock_data = data_fetcher.get_stock_data(all_codes[:40], max_workers=10)
+        
+        # ===== 4. 板块轮动（每30分钟扫描） =====
+        scan_results = None
+        if should_run_full_scan():
+            print("\n" + "="*60)
+            print("🔥 板块轮动扫描")
+            print("="*60)
+            sector_tracker = get_sector_tracker()
+            sector_result = sector_tracker.run_sector_scan()
+            print(sector_tracker.get_sector_summary())
             
-            # ===== 5. 策略0: 强势股低吸（最优先） =====
-            dip_items = [item for item in watchlist.get_all() if '低吸' in item.category]
-            if dip_items:
-                print("\n" + "="*60)
-                print("💧 重点监控-强势股低吸（昨日强势，今日回调）")
-                print("="*60)
-                
-                for item in sorted(dip_items, key=lambda x: x.priority, reverse=True)[:5]:
-                    code = item.code
-                    if code in stock_data:
-                        data = stock_data[code]
-                        current = data['current']
-                        change = data['change_pct']
-                        
-                        # 判断买点质量
-                        if -3 <= change <= -1:
-                            status = "✅ 理想买点（回调适中）"
-                        elif -4 <= change < -3:
-                            status = "⚠️ 偏深回调（谨慎）"
-                        elif -1 < change < 0:
-                            status = "📝 微回调（可等）"
-                        else:
-                            status = "❌ 不符预期"
-                        
-                        print(f"💧 {item.name}({code}): {current:.2f} ({change:+.2f}%)")
-                        print(f"   {status} | {item.notes[:50]}")
+            # ===== 5. 三策略选股扫描（每30分钟） =====
+            print("\n" + "="*60)
+            print("✨ 三策略选股扫描")
+            print("="*60)
+            auto_manager = get_auto_manager()
+            scan_results = auto_manager.run_full_scan()
             
-            # ===== 6. 策略1: 追涨型（板块龙头+强势股） =====
-            chase_items = [item for item in watchlist.get_all() if '追涨' in item.category]
-            if chase_items:
-                print("\n" + "="*60)
-                print("🚀 重点监控-追涨型（板块龙头+强势股）")
-                print("="*60)
-                
-                for item in sorted(chase_items, key=lambda x: x.priority, reverse=True)[:5]:
-                    code = item.code
-                    if code in stock_data:
-                        data = stock_data[code]
-                        current = data['current']
-                        change = data['change_pct']
-                        
-                        # 判断买入建议
-                        if change > 3:
-                            status = "✅ 强势-可考虑追涨"
-                        elif change > 0:
-                            status = "⚠️ 温和-继续观察"
-                        else:
-                            status = "❌ 转弱-放弃追涨"
-                        
-                        print(f"🚀 {item.name}({code}): {current:.2f} ({change:+.2f}%)")
-                        print(f"   {status} | {item.notes[:50]}")
-            
-            # ===== 6. 策略2: 潜力型（热门板块核心标的） =====
-            potential_items = [item for item in watchlist.get_all() if '潜力' in item.category]
-            if potential_items:
-                print("\n" + "="*60)
-                print("💎 重点监控-潜力型（热门板块核心标的）")
-                print("="*60)
-                
-                for item in sorted(potential_items, key=lambda x: x.priority, reverse=True)[:5]:
-                    code = item.code
-                    if code in stock_data:
-                        data = stock_data[code]
-                        current = data['current']
-                        change = data['change_pct']
-                        
-                        # 判断启动信号
-                        if change > 2:
-                            status = "✅ 启动-开始上涨"
-                        elif 0 < change <= 2:
-                            status = "⏳ 蓄势-等待放量"
-                        else:
-                            status = "📝 观察-暂未启动"
-                        
-                        print(f"💎 {item.name}({code}): {current:.2f} ({change:+.2f}%)")
-                        print(f"   {status} | {item.notes[:50]}")
-            
-            # ===== 7. 策略3: 抄底型（调整后低位企稳） =====
-            bottom_items = [item for item in watchlist.get_all() if '抄底' in item.category]
-            if bottom_items:
-                print("\n" + "="*60)
-                print("🎯 重点监控-抄底型（热门板块调整后的低位机会）")
-                print("="*60)
-                
-                for item in sorted(bottom_items, key=lambda x: x.priority, reverse=True)[:5]:
-                    code = item.code
-                    if code in stock_data:
-                        data = stock_data[code]
-                        current = data['current']
-                        change = data['change_pct']
-                        
-                        # 判断企稳信号
-                        if change > 1:
-                            status = "✅ 企稳-开始反弹"
-                        elif -1 <= change <= 1:
-                            status = "⏳ 筑底-观察确认"
-                        else:
-                            status = "❌ 弱势-继续等待"
-                        
-                        print(f"🎯 {item.name}({code}): {current:.2f} ({change:+.2f}%)")
-                        print(f"   {status} | {item.notes[:50]}")
-            
-            # ===== 8. 策略4: 多维度综合优选 =====
-            multi_items = [item for item in watchlist.get_all() if '优选' in item.category]
-            if multi_items:
-                print("\n" + "="*60)
-                print("⭐ 重点监控-多维度优选（趋势+基本面+资金+技术+板块）")
-                print("="*60)
-                
-                for item in sorted(multi_items, key=lambda x: x.priority, reverse=True)[:5]:
-                    code = item.code
-                    if code in stock_data:
-                        data = stock_data[code]
-                        current = data['current']
-                        change = data['change_pct']
-                        
-                        # 判断表现
-                        if change > 3:
-                            status = "✅ 强势上涨，综合评分有效"
-                        elif change > 0:
-                            status = "🟢 温和上涨，符合预期"
-                        elif change > -2:
-                            status = "⏳ 小幅调整，观察中"
-                        else:
-                            status = "⚠️ 跌幅较大，重新评估"
-                        
-                        print(f"⭐ {item.name}({code}): {current:.2f} ({change:+.2f}%)")
-                        print(f"   {status} | {item.notes[:50]}")
-            
-            # ===== 9. 板块龙头监控 =====
-            sector_items = watchlist.get_by_category("板块龙头")
-            if sector_items:
-                print("\n" + "="*60)
-                print("🏆 板块龙头监控")
-                print("="*60)
-                
-                for item in sorted(sector_items, key=lambda x: x.priority, reverse=True)[:5]:
-                    code = item.code
-                    if code in stock_data:
-                        data = stock_data[code]
-                        print(f"📈 {item.name}({code}): {data['current']:.2f} ({data['change_pct']:+.2f}%)")
-            
-            # ===== 9. 持仓监控 =====
+            # ===== 6. 智能调仓分析（每30分钟，全量扫描时）=====
             if positions:
                 print("\n" + "="*60)
-                print("📈 持仓监控")
+                print("🤖 智能调仓分析")
                 print("="*60)
-                
-                for pos in positions:
-                    code = pos['code']
-                    if code in stock_data:
-                        data = stock_data[code]
-                        current = data['current']
-                        change = data['change_pct']
-                        pnl = (current - pos['cost_price']) / pos['cost_price'] * 100
-                        emoji = "🟢" if pnl >= 0 else "🔴"
-                        print(f"{emoji} {pos['name']}({code}): {current:.2f} ({change:+.2f}%) 盈亏: {pnl:+.2f}%")
-            
-            # ===== 10. 形态走坏降级提示 =====
-            degraded_items = [item for item in watchlist.get_all() if "❌已降级" in item.notes]
-            if degraded_items:
-                print("\n" + "="*60)
-                print("⚠️ 已取消重点监控（形态走坏）")
-                print("="*60)
-                for item in degraded_items[:3]:
-                    code = item.code
-                    if code in stock_data:
-                        data = stock_data[code]
-                        print(f"❌ {item.name}({code}): {data['current']:.2f} ({data['change_pct']:+.2f}%)")
+                try:
+                    advisor = SmartRebalanceAdvisor()
+                    analysis = advisor.generate_full_analysis()
+                    rebalance_report = advisor.generate_comprehensive_report(analysis)
+                    # 只显示核心建议
+                    print(f"  已分析 {len(analysis['health_reports'])} 只持仓股")
+                    print(f"  发现 {len(analysis['opportunities'])} 个换仓机会")
+                    if analysis['recommendations']:
+                        print("\n  核心建议:")
+                        for rec in analysis['recommendations'][:3]:
+                            print(f"    • {rec['title']}")
+                            print(f"      建议: {rec['action'][:50]}")
+                except Exception as e:
+                    print(f"  调仓分析跳过: {e}")
         
-        # ===== 12. 买入建议总结 =====
-        print("\n" + "="*60)
+        # ===== 7. 获取所有自选股并按策略分类（只获取一次）=====
+        all_items = watchlist.get_all()
+        
+        # 按策略分类
+        dip_items = [item for item in all_items if '低吸' in item.category]
+        chase_items = [item for item in all_items if '追涨' in item.category]
+        potential_items = [item for item in all_items if '潜力' in item.category]
+        bottom_items = [item for item in all_items if '抄底' in item.category]
+        multi_items = [item for item in all_items if '优选' in item.category]
+        sector_items = watchlist.get_by_category("板块龙头")
+        
+        # ===== 8. 策略0: 强势股低吸（最优先） =====
+        print_strategy_items(
+            dip_items, stock_data, "强势股低吸（昨日强势，今日回调）", "💧",
+            lambda change: "✅ 理想买点（回调适中）" if -3 <= change <= -1 else 
+                          "⚠️ 偏深回调（谨慎）" if -4 <= change < -3 else 
+                          "📝 微回调（可等）" if -1 < change < 0 else "❌ 不符预期"
+        )
+        
+        # ===== 9. 策略1: 追涨型（板块龙头+强势股） =====
+        print_strategy_items(
+            chase_items, stock_data, "追涨型（板块龙头+强势股）", "🚀",
+            lambda change: "✅ 强势-可考虑追涨" if change > 3 else 
+                          "⚠️ 温和-继续观察" if change > 0 else "❌ 转弱-放弃追涨"
+        )
+        
+        # ===== 10. 策略2: 潜力型（热门板块核心标的） =====
+        print_strategy_items(
+            potential_items, stock_data, "潜力型（热门板块核心标的）", "💎",
+            lambda change: "✅ 启动-开始上涨" if change > 2 else 
+                          "⏳ 蓄势-等待放量" if 0 < change <= 2 else "📝 观察-暂未启动"
+        )
+        
+        # ===== 11. 策略3: 抄底型（调整后低位企稳） =====
+        print_strategy_items(
+            bottom_items, stock_data, "抄底型（热门板块调整后的低位机会）", "🎯",
+            lambda change: "✅ 企稳-开始反弹" if change > 1 else 
+                          "⏳ 筑底-观察确认" if -1 <= change <= 1 else "❌ 弱势-继续等待"
+        )
+        
+        # ===== 12. 策略4: 多维度综合优选 =====
+        print_strategy_items(
+            multi_items, stock_data, "多维度优选（趋势+基本面+资金+技术+板块）", "⭐",
+            lambda change: "✅ 强势上涨，综合评分有效" if change > 3 else 
+                          "🟢 温和上涨，符合预期" if change > 0 else 
+                          "⏳ 小幅调整，观察中" if change > -2 else "⚠️ 跌幅较大，重新评估"
+        )
+        
+        # ===== 13. 板块龙头监控 =====
+        if sector_items:
+            print(f"\n{'='*60}")
+            print("🏆 板块龙头监控")
+            print("="*60)
+            
+            for item in sorted(sector_items, key=lambda x: x.priority, reverse=True)[:5]:
+                code = item.code
+                if code in stock_data:
+                    data = stock_data[code]
+                    print(f"📈 {item.name}({code}): {data['current']:.2f} ({data['change_pct']:+.2f}%)")
+        
+        # ===== 14. 持仓监控 =====
+        if positions:
+            print(f"\n{'='*60}")
+            print("📈 持仓监控")
+            print("="*60)
+            
+            for pos in positions:
+                code = pos['code']
+                if code in stock_data:
+                    data = stock_data[code]
+                    current = data['current']
+                    change = data['change_pct']
+                    pnl = (current - pos['cost_price']) / pos['cost_price'] * 100
+                    emoji = "🟢" if pnl >= 0 else "🔴"
+                    print(f"{emoji} {pos['name']}({code}): {current:.2f} ({change:+.2f}%) 盈亏: {pnl:+.2f}%")
+        
+        # ===== 15. 形态走坏降级提示 =====
+        degraded_items = [item for item in all_items if "❌已降级" in (item.notes or "")]
+        if degraded_items:
+            print(f"\n{'='*60}")
+            print("⚠️ 已取消重点监控（形态走坏）")
+            print("="*60)
+            for item in degraded_items[:3]:
+                code = item.code
+                if code in stock_data:
+                    data = stock_data[code]
+                    print(f"❌ {item.name}({code}): {data['current']:.2f} ({data['change_pct']:+.2f}%)")
+        
+        # ===== 16. 买入建议总结 =====
+        print(f"\n{'='*60}")
         print("💡 买入建议总结")
         print("="*60)
         
         # 强势股低吸优先
         dip_buy = []
-        for item in watchlist.get_all():
+        for item in dip_items:
             code = item.code
-            if code in stock_data and '低吸' in item.category:
+            if code in stock_data:
                 data = stock_data[code]
                 change = data['change_pct']
                 if -4 <= change <= -1:  # 回调适中
@@ -318,7 +261,7 @@ def main():
         
         # 其他策略
         other_buy = []
-        for item in watchlist.get_all():
+        for item in all_items:
             code = item.code
             if code in stock_data:
                 data = stock_data[code]
@@ -344,8 +287,10 @@ def main():
             print("   🎯 抄底型：等待调整企稳确认")
             print("   ⭐ 多维度：等待高综合评分标的")
         
-        print("\n" + "="*60)
-        print(f"✅ 监控完成 [{datetime.now().strftime('%H:%M:%S')}]")
+        # 计算运行时间
+        elapsed = (datetime.now() - start_time).total_seconds()
+        print(f"\n{'='*60}")
+        print(f"✅ 监控完成 [{datetime.now().strftime('%H:%M:%S')}] (耗时{elapsed:.1f}秒)")
         print("="*60 + "\n")
         
     except Exception as e:

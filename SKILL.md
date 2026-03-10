@@ -14,10 +14,71 @@ A股量化交易管理系统
 - 自动切换，互为兜底
 - 只使用真实数据，禁止AI生成假数据
 
-### 2. 自选股管理 (core/watchlist_memory.py)
+### 2. 自选股管理 (core/watchlist_memory.py / watchlist_memory_v2.py)
+
+#### V1基础版 (watchlist_memory.py)
 - 管理观察池股票
 - 支持分类和标签
 - 持久化存储
+
+#### V2增强版 (watchlist_memory_v2.py) - 推荐使用
+**分级管理 + 策略类型 + 深度分析**
+
+**关注级别分级：**
+- 🔴 **特别关注** - 高频监控（每10分钟），实时提醒
+- 🟡 **一般关注** - 常规监控（每30分钟），重要信号提醒
+- 🟢 **观察** - 低频监控（每60分钟），极端情况提醒
+
+**策略类型标记：**
+| 类型 | Emoji | 说明 |
+|------|-------|------|
+| 追涨型 | 🚀 | 板块龙头、强势突破 |
+| 低吸型 | 💧 | 强势股回调买入 |
+| 潜力型 | 💎 | 热门板块蓄势待发 |
+| 抄底型 | 🎯 | 大跌后低位企稳 |
+| 价值型 | 💰 | 低PE高ROE |
+| 震荡型 | ⏳ | 震荡整理等待突破 |
+| 补涨型 | 📈 | 板块滞涨个股 |
+| 多维优选型 | ⭐ | 综合评分≥65分 |
+| 板块龙头 | 🏆 | 板块领涨龙头 |
+
+**深度分析字段：**
+- **选股原因** - 主要原因、次要原因、关键指标、市场环境、板块情况
+- **买入计划** - 买入价、止损价、目标价、仓位建议、持有周期
+- **风险因素** - 潜在风险清单
+- **失效条件** - 选股逻辑失效的触发条件
+- **预期走势** - 期望的价格走势
+
+**使用示例：**
+```python
+from core.watchlist_memory_v2 import get_watchlist_memory_v2, SelectionReason, EntryPlan
+
+wl = get_watchlist_memory_v2()
+
+# 添加带完整分析的股票
+wl.add_with_full_analysis(
+    code='603019',
+    name='中科曙光',
+    attention_level='特别关注',
+    strategy_type='低吸型',
+    selection_reason=SelectionReason(
+        primary_reason='强势股回调买入机会',
+        secondary_reasons=['昨日强势', '今日良性回调'],
+        key_indicators={'回调幅度': -2.5, '板块': 'AI算力'},
+        expected_scenario='短期企稳反弹',
+        invalidation_conditions=['继续下跌超5%', '放量破位']
+    ),
+    entry_plan=EntryPlan(
+        entry_price=28.5,
+        stop_loss=27.0,
+        target_price=32.0,
+        position_size='半仓',
+        holding_period='短线'
+    ),
+    linked_sectors=['AI算力', '服务器'],
+    notes='💧强势股低吸 | 回调-2.5% | 计划买入28.5'
+)
+```
 
 ### 3. 自动选股管理 (core/auto_watchlist_manager.py)
 **五策略自动选股系统 + 多维度分析引擎**
@@ -109,7 +170,9 @@ sector.add_stock_to_sector('AI算力', '300418')
 - 风险控制
 - 仓位管理
 
-### 7. 盘中监控 (scripts/intraday_monitor.py)
+### 7. 盘中监控
+
+#### V1版 (scripts/intraday_monitor.py)
 **增强版监控，整合所有模块**
 - 大盘监控
 - 板块轮动扫描（每30分钟）
@@ -119,6 +182,52 @@ sector.add_stock_to_sector('AI算力', '300418')
 - 持仓监控
 - 买入建议总结
 - 形态走坏降级提示
+
+#### V2整合版 (scripts/intraday_monitor_integrated.py) - 推荐使用
+**分级精准监控 + 策略联动 + 深度分析验证**
+
+**监控分级：**
+```
+🔴 特别关注 (每10分钟)
+   - 实时价格监控
+   - 策略特定检查（追涨/低吸/抄底等）
+   - 买入计划提醒（到达买入价/止损价/目标价）
+   - 选股原因持续验证
+
+🟡 一般关注 (每30分钟)
+   - 重要波动提醒（涨跌幅≥3%）
+   - 买入信号检查
+
+🟢 观察 (每60分钟)
+   - 极端情况提醒（涨跌幅≥5%）
+```
+
+**策略联动机制：**
+| 策略类型 | 买入信号 | 止损信号 | 特殊提醒 |
+|----------|----------|----------|----------|
+| 追涨型 | 涨幅>5% | 跌幅<-3% | 强势确认 |
+| 低吸型 | -4%<涨幅<-1% | 跌幅<-5% | 回调到位 |
+| 抄底型 | -2%<涨幅<1% | - | 止跌信号 |
+| 价值型 | 跌幅<-3% | - | 加仓机会 |
+| 板块龙头 | 涨幅>3% | - | 领涨确认 |
+
+**使用方式：**
+```bash
+# 快速模式 - 只监控特别关注
+python3 scripts/intraday_monitor_integrated.py --quick
+
+# 标准模式
+python3 scripts/intraday_monitor_integrated.py
+
+# 全量模式（包含板块扫描）
+python3 scripts/intraday_monitor_integrated.py --full
+
+# 查看V2自选股列表
+python3 scripts/intraday_monitor_integrated.py --v2-list
+
+# 查看某股票详细分析
+python3 scripts/intraday_monitor_integrated.py --detail 603019
+```
 
 ## 使用方式
 
@@ -133,10 +242,64 @@ python3 main.py
 - 新浪财经
 - AKShare
 
-## 监控脚本
+### 8. 自选股深度管理 (scripts/add_stock_with_analysis.py)
+**带完整分析的选股添加工具**
 
-```bash
-python3 scripts/intraday_monitor.py
+**功能：**
+- 添加强势股低吸标的（带完整分析）
+- 添加追涨型标的
+- 添加价值型标的
+- 添加多维度优选标的
+- 查看股票详细分析
+
+**使用示例：**
+```python
+from scripts.add_stock_with_analysis import add_dip_buy_stock, view_stock_detail
+
+# 添加强势股低吸
+add_dip_buy_stock(
+    code='603019',
+    name='中科曙光',
+    current_price=28.5,
+    change_pct=-2.5,
+    sector='AI算力',
+    confidence='高'
+)
+
+# 查看详细分析
+view_stock_detail('603019')
+```
+
+**查看详细分析输出：**
+```
+📋 中科曙光(603019) 详细分析
+============================================================
+【基础信息】
+  关注级别: 🔴 特别关注
+  策略类型: 💧 低吸型
+  关联板块: AI算力, 服务器
+  添加日期: 2026-03-10
+
+【选股原因】
+  主要原因: 强势股回调买入机会，今日回调-2.5%
+  次要原因:
+    • 昨日强势上涨，证明有资金关注
+    • 今日良性回调，未出现恐慌抛售
+  关键指标:
+    • 回调幅度: -2.5
+    • 板块: AI算力
+  预期走势: 短期企稳反弹，目标3-5%收益
+  风险因素:
+    ⚠️ 回调可能演变为下跌趋势
+  失效条件:
+    ❌ 继续下跌超过5%，破位止损
+
+【买入计划】
+  买入价: 28.50
+  止损价: 27.00
+  目标价: 32.00
+  建议仓位: 半仓
+  持有周期: 短线（3-5天）
 ```
 
 ## 监控时间表

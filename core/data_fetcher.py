@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 """
-数据获取模块 - DataFetcher V2
+数据获取模块 - DataFetcher V2 (并行优化版)
 底层死规则：
 1. 禁止AI生成任何假数据
 2. 数据获取失败必须报错，不能瞎编
 3. 多数据源配置：腾讯→东财→新浪→AKShare，自动重试+合并数据
 4. 历史数据缓存，实时数据优先，缓存补充缺失字段
 5. 只返回真实数据或明确报错
+6. 并行获取加速 - 使用线程池
 """
 
 import requests
@@ -16,6 +17,8 @@ import pickle
 from datetime import datetime
 from typing import Dict, List, Optional
 from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import threading
 
 class DataFetcher:
     """数据获取器 - 多数据源自动切换+智能缓存"""
@@ -130,70 +133,99 @@ class DataFetcher:
         print(error_msg)
         raise Exception(error_msg)
     
-    def get_stock_data(self, codes: List[str]) -> Dict:
+    def get_stock_data(self, codes: List[str], max_workers: int = 8) -> Dict:
         """
-        获取个股数据 - 多数据源自动切换+智能缓存
+        获取个股数据 - 多数据源自动切换+智能缓存+并行处理
         策略：
         1. 先尝试加载缓存
-        2. 获取实时数据（多数据源合并）
+        2. 获取实时数据（多数据源合并）- 并行处理
         3. 合并实时+缓存
         4. 保存新缓存
+        
+        Args:
+            codes: 股票代码列表
+            max_workers: 并行线程数，默认8
         """
         if not codes:
             return {}
         
         result = {}
+        lock = threading.Lock()
         
-        for code in codes:
-            # 1. 加载缓存
-            cached_data = self._load_cache(code)
-            
-            # 2. 获取实时数据（多源合并）
-            real_time_data = self._fetch_stock_merged(code)
-            
-            # 3. 合并数据
-            if real_time_data:
-                merged = self._merge_stock_data(real_time_data, cached_data)
-                result[code] = merged
-                # 保存缓存
-                self._save_cache(code, merged)
-            elif cached_data:
-                # 实时失败，用缓存（过期也先用着）
-                print(f"  ⚠️ {code}: 实时数据失败，使用缓存数据")
-                result[code] = cached_data
-            else:
-                print(f"  ❌ {code}: 无实时数据且无缓存")
+        def fetch_single_stock(code):
+            """获取单只股票数据"""
+            try:
+                # 1. 加载缓存
+                cached_data = self._load_cache(code)
+                
+                # 2. 获取实时数据（多源合并）
+                real_time_data = self._fetch_stock_merged(code)
+                
+                # 3. 合并数据
+                if real_time_data:
+                    merged = self._merge_stock_data(real_time_data, cached_data)
+                    # 保存缓存
+                    self._save_cache(code, merged)
+                    with lock:
+                        result[code] = merged
+                elif cached_data:
+                    # 实时失败，用缓存（过期也先用着）
+                    print(f"  ⚠️ {code}: 实时数据失败，使用缓存数据")
+                    with lock:
+                        result[code] = cached_data
+                else:
+                    print(f"  ❌ {code}: 无实时数据且无缓存")
+            except Exception as e:
+                print(f"  ❌ {code}: 获取异常 - {str(e)[:40]}")
         
+        # 使用线程池并行获取
+        print(f"  并行获取 {len(codes)} 只股票数据 (线程数: {max_workers})...")
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            futures = {executor.submit(fetch_single_stock, code): code for code in codes}
+            for future in as_completed(futures):
+                code = futures[future]
+                try:
+                    future.result()
+                except Exception as e:
+                    print(f"  ❌ {code}: 线程执行失败 - {e}")
+        
+        print(f"  ✅ 成功获取 {len(result)}/{len(codes)} 只股票数据")
         return result
     
-    def _fetch_stock_merged(self, code: str) -> Optional[Dict]:
-        """获取实时数据 - 多数据源合并
+    def _fetch_stock_merged(self, code: str, primary_only: bool = True) -> Optional[Dict]:
+        """获取实时数据 - 优化版
         策略：
-        1. 腾讯/新浪获取价格和基础数据
-        2. 东财获取技术指标
-        3. 合并所有数据
+        - primary_only=True: 只使用腾讯（最快）
+        - primary_only=False: 腾讯+东财双源合并
+        
+        已移除AKShare（太慢），保留东财作为兜底
         """
         merged_data = {}
         
-        # 数据源列表
-        sources = [
-            ('腾讯', self._get_stock_tencent),
-            ('东财', self._get_stock_eastmoney),
-            ('AKShare', self._get_stock_akshare),
-        ]
+        # 主数据源：腾讯（最快）
+        try:
+            data = self._get_stock_tencent([code])
+            if data and code in data:
+                merged_data = data[code].copy()
+        except Exception as e:
+            print(f"  [实时] {code}: 腾讯失败 - {str(e)[:30]}")
         
-        for name, fetch_func in sources:
+        # 如果腾讯成功且只需要主源，直接返回
+        if merged_data and primary_only:
+            return merged_data
+        
+        # 腾讯失败或需要双源，尝试东财
+        if not merged_data or not primary_only:
             try:
-                data = fetch_func([code])
+                data = self._get_stock_eastmoney([code])
                 if data and code in data:
-                    print(f"  [实时] {code}: {name}成功")
-                    # 合并数据，新数据覆盖旧数据（非零值）
+                    print(f"  [实时] {code}: 东财兜底成功")
+                    # 合并数据
                     for key, value in data[code].items():
                         if value not in [0, None, ''] or key not in merged_data:
                             merged_data[key] = value
             except Exception as e:
-                print(f"  [实时] {code}: {name}失败 - {str(e)[:40]}")
-                continue
+                print(f"  [实时] {code}: 东财失败 - {str(e)[:30]}")
         
         if merged_data:
             return merged_data

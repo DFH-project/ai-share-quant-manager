@@ -1,0 +1,711 @@
+{
+  "watchlist": [
+    {
+      "code": "603127",
+      "name": "昭衍新药",
+      "added_date": "2026-03-10",
+      "attention_level": "一般关注",
+      "strategy_type": "板块龙头",
+      "category": "default",
+      "tags": [],
+      "linked_sectors": [
+        "板块龙头",
+        "医药",
+        "领涨"
+      ],
+      "selection_reason": {
+        "primary_reason": "🏆医药龙头 +3.60%",
+        "secondary_reasons": [],
+        "key_indicators": {},
+        "market_context": "",
+        "sector_context": "",
+        "risk_factors": [],
+        "selection_time": "2026-03-06",
+        "expected_scenario": "",
+        "invalidation_conditions": []
+      },
+      "entry_plan": {
+        "entry_price": 0.0,
+        "stop_loss": 0.0,
+        "target_price": 0.0,
+        "position_size": "",
+        "holding_period": ""
+      },
+      "priority": 50,
+      "alert_threshold": {},
+      "notes": "🏆医药龙头 +3.60%",
+      "update_history": [],
+      "performance_tracking": {}
+    },
+    {
+      "code": "002714",
+      "name": "牧原股份",
+      "added_date": "2026-03-10",
+      "attention_level": "一般关注",
+      "strategy_type": "板块龙头",
+      "category": "default",
+      "tags": [],
+      "linked_sectors": [
+        "板块龙头",
+        "消费",
+        "领涨"
+      ],
+      "selection_reason": {
+        "primary_reason": "🏆消费龙头 +5.43%",
+        "secondary_reasons": [],
+        "key_indicators": {},
+        "market_context": "",
+        "sector_context": "",
+        "risk_factors": [],
+        "selection_time": "2026-03-06",
+        "expected_scenario": "",
+        "invalidation_conditions": []
+      },
+      "entry_plan": {
+        "entry_price": 0.0,
+        "stop_loss": 0.0,
+        "target_price": 0.0,
+        "position_size": "",
+        "holding_period": ""
+      },
+      "priority": 50,
+      "alert_threshold": {},
+      "notes": "🏆消费龙头 +5.43%",
+      "update_history": [],
+      "performance_tracking": {}
+    },
+    {
+      "code": "600276",
+      "name": "恒瑞医药",
+      "added_date": "2026-03-10",
+      "attention_level": "一般关注",
+      "strategy_type": "多维优选型",
+      "category": "default",
+      "tags": [],
+      "linked_sectors": [
+        "自动发现",
+        "多维度优选"
+      ],
+      "selection_reason": {
+        "primary_reason": "⭐多维度优选 65.0分 综合评分65 趋势80 资金40 建议买入，整体向好 价格:55.12",
+        "secondary_reasons": [],
+        "key_indicators": {},
+        "market_context": "",
+        "sector_context": "",
+        "risk_factors": [],
+        "selection_time": "2026-03-06",
+        "expected_scenario": "",
+        "invalidation_conditions": []
+      },
+      "entry_plan": {
+        "entry_price": 0.0,
+        "stop_loss": 0.0,
+        "target_price": 0.0,
+        "position_size": "",
+        "holding_period": ""
+      },
+      "priority": 50,
+      "alert_threshold": {},
+      "notes": "⭐多维度优选 65.0分 综合评分65 趋势80 资金40 建议买入，整体向好 价格:55.12",
+      "update_history": [],
+      "performance_tracking": {}
+    },
+    {
+      "code": "000099",
+      "name": "中信海直",
+      "added_date": "2026-03-10",
+      "attention_level": "观察",
+      "strategy_type": "多维优选型",
+      "category": "default",
+      "tags": [],
+      "linked_sectors": [
+        "自动发现",
+        "多维度优选"
+      ],
+      "selection_reason": {
+        "primary_reason": "⭐多维度优选 65.0分 综合评分65 趋势80 资金40 建议买入，整体向好 价格:21.46",
+        "secondary_reasons": [],
+        "key_indicators": {},
+        "market_context": "",
+        "sector_context": "",
+        "risk_factors": [],
+        "selection_time": "2026-03-06",
+        "expected_scenario": "",
+        "invalidation_conditions": []
+      },
+      "entry_plan": {
+        "entry_price": 0.0,
+        "stop_loss": 0.0,
+        "target_price": 0.0,
+        "position_size": "",
+        "holding_period": ""
+      },
+      "priority": 20,
+      "alert_threshold": {},
+      "notes": "⭐多维度优选 65.0分 综合评分65 趋势80 资金40 建议买入，整体向好 价格:21.46",
+      "update_history": [],
+      "performance_tracking": {}
+    },
+    {
+      "code": "002085",
+      "name": "万丰奥威",
+      "added_date": "2026-03-10",
+      "attention_level": "一般关注",
+      "strategy_type": "多维优选型",
+      "category": "default",
+      "tags": [],
+      "linked_sectors": [
+        "自动发现",
+        "多维度优选"
+      ],
+      "selection_reason": {
+        "primary_reason": "⭐多维度优选 65.0分 综合评分65 趋势80 资金40 建议买入，整体向好 价格:16.74",
+        "secondary_reasons": [],
+        "key_indicators": {},
+        "market_context": "",
+        "sector_context": "",
+        "risk_factors": [],
+        "selection_time": "2026-03-06",
+        "expected_scenario": "",
+        "invalidation_conditions": []
+      },
+      "entry_plan": {
+        "entry_price": 0.0,
+        "stop_loss": 0.0,
+        "target_price": 0.0,
+        "position_size": "",
+        "holding_period": ""
+      },
+      "priority": 50,
+      "alert_threshold": {},
+      "notes": "⭐多维度优选 65.0分 综合评分65 趋势80 资金40 建议买入，整体向好 价格:16.74",
+      "update_history": [],
+      "performance_tracking": {}
+    },
+    {
+      "code": "300124",
+      "name": "汇川技术",
+      "added_date": "2026-03-10",
+      "attention_level": "特别关注",
+      "strategy_type": "板块龙头",
+      "category": "default",
+      "tags": [],
+      "linked_sectors": [
+        "自动发现",
+        "多维度优选"
+      ],
+      "selection_reason": {
+        "primary_reason": "🦾[重点-机器人] | 评分:59.0分 | 价格:70.36 | 涨幅:-1.55% | 触发:重",
+        "secondary_reasons": [],
+        "key_indicators": {},
+        "market_context": "",
+        "sector_context": "",
+        "risk_factors": [],
+        "selection_time": "2026-03-06",
+        "expected_scenario": "",
+        "invalidation_conditions": []
+      },
+      "entry_plan": {
+        "entry_price": 0.0,
+        "stop_loss": 0.0,
+        "target_price": 0.0,
+        "position_size": "",
+        "holding_period": ""
+      },
+      "priority": 90,
+      "alert_threshold": {},
+      "notes": "🦾[重点-机器人] | 评分:59.0分 | 价格:70.36 | 涨幅:-1.55% | 触发:重点板块-机器人|综合59分|观望，等待更明确信号 | @10:04",
+      "update_history": [],
+      "performance_tracking": {}
+    },
+    {
+      "code": "300750",
+      "name": "宁德时代",
+      "added_date": "2026-03-10",
+      "attention_level": "特别关注",
+      "strategy_type": "多维优选型",
+      "category": "default",
+      "tags": [],
+      "linked_sectors": [
+        "自动发现",
+        "多维度优选"
+      ],
+      "selection_reason": {
+        "primary_reason": "⭐多维度优选:66.0分 综合评分66 趋势70 资金40 建议买入，整体向好 14:30",
+        "secondary_reasons": [],
+        "key_indicators": {},
+        "market_context": "",
+        "sector_context": "",
+        "risk_factors": [],
+        "selection_time": "2026-03-06",
+        "expected_scenario": "",
+        "invalidation_conditions": []
+      },
+      "entry_plan": {
+        "entry_price": 0.0,
+        "stop_loss": 0.0,
+        "target_price": 0.0,
+        "position_size": "",
+        "holding_period": ""
+      },
+      "priority": 90,
+      "alert_threshold": {},
+      "notes": "⭐多维度优选:66.0分 综合评分66 趋势70 资金40 建议买入，整体向好 14:30",
+      "update_history": [],
+      "performance_tracking": {}
+    },
+    {
+      "code": "600584",
+      "name": "长电科技",
+      "added_date": "2026-03-10",
+      "attention_level": "特别关注",
+      "strategy_type": "低吸型",
+      "category": "default",
+      "tags": [],
+      "linked_sectors": [
+        "自动发现",
+        "强势股低吸"
+      ],
+      "selection_reason": {
+        "primary_reason": "💧强势股低吸 60分 热门板块-半导体 良性回调 未放量恐慌 价格:47.98",
+        "secondary_reasons": [],
+        "key_indicators": {},
+        "market_context": "",
+        "sector_context": "",
+        "risk_factors": [],
+        "selection_time": "2026-03-06",
+        "expected_scenario": "",
+        "invalidation_conditions": []
+      },
+      "entry_plan": {
+        "entry_price": 0.0,
+        "stop_loss": 0.0,
+        "target_price": 0.0,
+        "position_size": "",
+        "holding_period": ""
+      },
+      "priority": 90,
+      "alert_threshold": {},
+      "notes": "💧强势股低吸 60分 热门板块-半导体 良性回调 未放量恐慌 价格:47.98",
+      "update_history": [],
+      "performance_tracking": {}
+    },
+    {
+      "code": "000988",
+      "name": "华工科技",
+      "added_date": "2026-03-10",
+      "attention_level": "观察",
+      "strategy_type": "手动添加",
+      "category": "default",
+      "tags": [],
+      "linked_sectors": [
+        "自动发现",
+        "多维度优选"
+      ],
+      "selection_reason": {
+        "primary_reason": "⭐特别关注-光模块龙头 综合70分 等待回调买入",
+        "secondary_reasons": [],
+        "key_indicators": {},
+        "market_context": "",
+        "sector_context": "",
+        "risk_factors": [],
+        "selection_time": "2026-03-06",
+        "expected_scenario": "",
+        "invalidation_conditions": []
+      },
+      "entry_plan": {
+        "entry_price": 0.0,
+        "stop_loss": 0.0,
+        "target_price": 0.0,
+        "position_size": "",
+        "holding_period": ""
+      },
+      "priority": 50,
+      "alert_threshold": {},
+      "notes": "⭐特别关注-光模块龙头 综合70分 等待回调买入",
+      "update_history": [],
+      "performance_tracking": {}
+    },
+    {
+      "code": "600196",
+      "name": "复星医药",
+      "added_date": "2026-03-10",
+      "attention_level": "一般关注",
+      "strategy_type": "多维优选型",
+      "category": "default",
+      "tags": [],
+      "linked_sectors": [
+        "自动发现",
+        "多维度优选"
+      ],
+      "selection_reason": {
+        "primary_reason": "⭐多维度优选:68.75分 综合评分69 趋势80 资金40 建议买入，整体向好 14:30",
+        "secondary_reasons": [],
+        "key_indicators": {},
+        "market_context": "",
+        "sector_context": "",
+        "risk_factors": [],
+        "selection_time": "2026-03-06",
+        "expected_scenario": "",
+        "invalidation_conditions": []
+      },
+      "entry_plan": {
+        "entry_price": 0.0,
+        "stop_loss": 0.0,
+        "target_price": 0.0,
+        "position_size": "",
+        "holding_period": ""
+      },
+      "priority": 50,
+      "alert_threshold": {},
+      "notes": "⭐多维度优选:68.75分 综合评分69 趋势80 资金40 建议买入，整体向好 14:30",
+      "update_history": [],
+      "performance_tracking": {}
+    },
+    {
+      "code": "601138",
+      "name": "工业富联",
+      "added_date": "2026-03-10",
+      "attention_level": "一般关注",
+      "strategy_type": "追涨型",
+      "category": "default",
+      "tags": [],
+      "linked_sectors": [
+        "AI算力",
+        "AI服务器",
+        "服务器",
+        "云服务"
+      ],
+      "selection_reason": {
+        "primary_reason": "🤖[重点-AI算力] | 评分:55.5分 | 价格:51.55 | 涨幅:-5.12% | 触发:",
+        "secondary_reasons": [],
+        "key_indicators": {},
+        "market_context": "",
+        "sector_context": "",
+        "risk_factors": [],
+        "selection_time": "2026-03-06",
+        "expected_scenario": "",
+        "invalidation_conditions": []
+      },
+      "entry_plan": {
+        "entry_price": 0.0,
+        "stop_loss": 0.0,
+        "target_price": 0.0,
+        "position_size": "",
+        "holding_period": ""
+      },
+      "priority": 50,
+      "alert_threshold": {},
+      "notes": "🤖[重点-AI算力] | 评分:55.5分 | 价格:51.55 | 涨幅:-5.12% | 触发:重点板块-AI算力|综合56分|观望，等待更明确信号 | @10:04",
+      "update_history": [],
+      "performance_tracking": {}
+    },
+    {
+      "code": "000977",
+      "name": "浪潮信息",
+      "added_date": "2026-03-10",
+      "attention_level": "特别关注",
+      "strategy_type": "追涨型",
+      "category": "default",
+      "tags": [],
+      "linked_sectors": [
+        "AI算力",
+        "AI服务器",
+        "服务器",
+        "云服务"
+      ],
+      "selection_reason": {
+        "primary_reason": "⭐特别关注-AI服务器 综合60分 买入价57以下",
+        "secondary_reasons": [],
+        "key_indicators": {},
+        "market_context": "",
+        "sector_context": "",
+        "risk_factors": [],
+        "selection_time": "2026-03-06",
+        "expected_scenario": "",
+        "invalidation_conditions": []
+      },
+      "entry_plan": {
+        "entry_price": 0.0,
+        "stop_loss": 0.0,
+        "target_price": 0.0,
+        "position_size": "",
+        "holding_period": ""
+      },
+      "priority": 90,
+      "alert_threshold": {},
+      "notes": "⭐特别关注-AI服务器 综合60分 买入价57以下",
+      "update_history": [],
+      "performance_tracking": {}
+    },
+    {
+      "code": "603019",
+      "name": "中科曙光",
+      "added_date": "2026-03-10",
+      "attention_level": "特别关注",
+      "strategy_type": "追涨型",
+      "category": "default",
+      "tags": [],
+      "linked_sectors": [
+        "AI应用",
+        "观察"
+      ],
+      "selection_reason": {
+        "primary_reason": "🔥AI服务器龙头，13:35已翻红+1.89%，后续关注突破机会",
+        "secondary_reasons": [],
+        "key_indicators": {},
+        "market_context": "",
+        "sector_context": "",
+        "risk_factors": [],
+        "selection_time": "2026-03-06",
+        "expected_scenario": "",
+        "invalidation_conditions": []
+      },
+      "entry_plan": {
+        "entry_price": 0.0,
+        "stop_loss": 0.0,
+        "target_price": 0.0,
+        "position_size": "",
+        "holding_period": ""
+      },
+      "priority": 90,
+      "alert_threshold": {},
+      "notes": "🔥AI服务器龙头，13:35已翻红+1.89%，后续关注突破机会",
+      "update_history": [],
+      "performance_tracking": {}
+    },
+    {
+      "code": "300308",
+      "name": "中际旭创",
+      "added_date": "2026-03-10",
+      "attention_level": "特别关注",
+      "strategy_type": "追涨型",
+      "category": "default",
+      "tags": [],
+      "linked_sectors": [
+        "CPO",
+        "光模块",
+        "AI算力",
+        "DeepSeek"
+      ],
+      "selection_reason": {
+        "primary_reason": "🔥CPO全球龙头，800G光模块核心供应商，DeepSeek催化受益",
+        "secondary_reasons": [],
+        "key_indicators": {},
+        "market_context": "",
+        "sector_context": "",
+        "risk_factors": [],
+        "selection_time": "2026-03-07",
+        "expected_scenario": "",
+        "invalidation_conditions": []
+      },
+      "entry_plan": {
+        "entry_price": 0.0,
+        "stop_loss": 0.0,
+        "target_price": 0.0,
+        "position_size": "",
+        "holding_period": ""
+      },
+      "priority": 90,
+      "alert_threshold": {},
+      "notes": "🔥CPO全球龙头，800G光模块核心供应商，DeepSeek催化受益",
+      "update_history": [],
+      "performance_tracking": {}
+    },
+    {
+      "code": "300502",
+      "name": "新易盛",
+      "added_date": "2026-03-10",
+      "attention_level": "一般关注",
+      "strategy_type": "追涨型",
+      "category": "default",
+      "tags": [],
+      "linked_sectors": [
+        "CPO",
+        "光模块",
+        "AI算力",
+        "DeepSeek"
+      ],
+      "selection_reason": {
+        "primary_reason": "🔥高速光模块龙头，DeepSeek推理需求爆发直接受益",
+        "secondary_reasons": [],
+        "key_indicators": {},
+        "market_context": "",
+        "sector_context": "",
+        "risk_factors": [],
+        "selection_time": "2026-03-07",
+        "expected_scenario": "",
+        "invalidation_conditions": []
+      },
+      "entry_plan": {
+        "entry_price": 0.0,
+        "stop_loss": 0.0,
+        "target_price": 0.0,
+        "position_size": "",
+        "holding_period": ""
+      },
+      "priority": 50,
+      "alert_threshold": {},
+      "notes": "🔥高速光模块龙头，DeepSeek推理需求爆发直接受益",
+      "update_history": [],
+      "performance_tracking": {}
+    },
+    {
+      "code": "300394",
+      "name": "天孚通信",
+      "added_date": "2026-03-10",
+      "attention_level": "一般关注",
+      "strategy_type": "追涨型",
+      "category": "default",
+      "tags": [],
+      "linked_sectors": [
+        "CPO",
+        "光引擎",
+        "AI算力",
+        "DeepSeek"
+      ],
+      "selection_reason": {
+        "primary_reason": "🔥光引擎/CPO关键部件，已给英伟达供货，国产替代受益",
+        "secondary_reasons": [],
+        "key_indicators": {},
+        "market_context": "",
+        "sector_context": "",
+        "risk_factors": [],
+        "selection_time": "2026-03-07",
+        "expected_scenario": "",
+        "invalidation_conditions": []
+      },
+      "entry_plan": {
+        "entry_price": 0.0,
+        "stop_loss": 0.0,
+        "target_price": 0.0,
+        "position_size": "",
+        "holding_period": ""
+      },
+      "priority": 50,
+      "alert_threshold": {},
+      "notes": "🔥光引擎/CPO关键部件，已给英伟达供货，国产替代受益",
+      "update_history": [],
+      "performance_tracking": {}
+    },
+    {
+      "code": "002371",
+      "name": "北方华创",
+      "added_date": "2026-03-10",
+      "attention_level": "特别关注",
+      "strategy_type": "板块龙头",
+      "category": "default",
+      "tags": [],
+      "linked_sectors": [
+        "自动发现",
+        "强势股低吸",
+        "半导体"
+      ],
+      "selection_reason": {
+        "primary_reason": "🔌[重点-半导体] | 评分:56.5分 | 价格:459.00 | 涨幅:-1.37% | 触发:",
+        "secondary_reasons": [],
+        "key_indicators": {},
+        "market_context": "",
+        "sector_context": "",
+        "risk_factors": [],
+        "selection_time": "2026-03-09",
+        "expected_scenario": "",
+        "invalidation_conditions": []
+      },
+      "entry_plan": {
+        "entry_price": 0.0,
+        "stop_loss": 0.0,
+        "target_price": 0.0,
+        "position_size": "",
+        "holding_period": ""
+      },
+      "priority": 90,
+      "alert_threshold": {},
+      "notes": "🔌[重点-半导体] | 评分:56.5分 | 价格:459.00 | 涨幅:-1.37% | 触发:重点板块-半导体|综合56分|观望，等待更明确信号 | @09:16",
+      "update_history": [],
+      "performance_tracking": {}
+    },
+    {
+      "code": "002594",
+      "name": "比亚迪",
+      "added_date": "2026-03-10",
+      "attention_level": "特别关注",
+      "strategy_type": "板块龙头",
+      "category": "default",
+      "tags": [],
+      "linked_sectors": [
+        "自动发现",
+        "重点-新能源",
+        "新能源"
+      ],
+      "selection_reason": {
+        "primary_reason": "🔋[重点-新能源] | 评分:68.75分 | 价格:96.54 | 涨幅:+3.12% | 触发:",
+        "secondary_reasons": [],
+        "key_indicators": {},
+        "market_context": "",
+        "sector_context": "",
+        "risk_factors": [],
+        "selection_time": "2026-03-09",
+        "expected_scenario": "",
+        "invalidation_conditions": []
+      },
+      "entry_plan": {
+        "entry_price": 0.0,
+        "stop_loss": 0.0,
+        "target_price": 0.0,
+        "position_size": "",
+        "holding_period": ""
+      },
+      "priority": 90,
+      "alert_threshold": {},
+      "notes": "🔋[重点-新能源] | 评分:68.75分 | 价格:96.54 | 涨幅:+3.12% | 触发:重点板块-新能源|综合69分|建议买入，整体向好 | @10:04",
+      "update_history": [],
+      "performance_tracking": {}
+    },
+    {
+      "code": "600460",
+      "name": "士兰微",
+      "added_date": "2026-03-10",
+      "attention_level": "一般关注",
+      "strategy_type": "低吸型",
+      "category": "default",
+      "tags": [],
+      "linked_sectors": [
+        "自动发现",
+        "强势股低吸",
+        "半导体"
+      ],
+      "selection_reason": {
+        "primary_reason": "💧[强势股低吸] | 评分:50分 | 价格:27.73 | 涨幅:-3.98% | 触发:热门板块",
+        "secondary_reasons": [],
+        "key_indicators": {},
+        "market_context": "",
+        "sector_context": "",
+        "risk_factors": [],
+        "selection_time": "2026-03-09",
+        "expected_scenario": "",
+        "invalidation_conditions": []
+      },
+      "entry_plan": {
+        "entry_price": 0.0,
+        "stop_loss": 0.0,
+        "target_price": 0.0,
+        "position_size": "",
+        "holding_period": ""
+      },
+      "priority": 50,
+      "alert_threshold": {},
+      "notes": "💧[强势股低吸] | 评分:50分 | 价格:27.73 | 涨幅:-3.98% | 触发:热门板块-半导体|深度回调|未放量恐慌 | @10:03",
+      "update_history": [],
+      "performance_tracking": {}
+    }
+  ],
+  "categories": [
+    "自选",
+    "关注",
+    "default",
+    "观察",
+    "持仓"
+  ],
+  "updated_at": "2026-03-10 11:07:13"
+}

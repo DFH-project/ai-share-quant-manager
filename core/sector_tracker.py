@@ -137,25 +137,49 @@ class SectorTracker:
         return self.SECTORS.get(sector_name, [])
     
     def calculate_sector_performance(self) -> Dict[str, Dict]:
-        """计算各板块表现"""
+        """计算各板块表现 - 优化版：批量获取数据，并行计算"""
         performance = {}
         
-        for sector_name, codes in self.SECTORS.items():
+        # 1. 收集所有板块的所有股票代码（去重）
+        all_codes = set()
+        for codes in self.SECTORS.values():
+            all_codes.update(codes)
+        all_codes = list(all_codes)
+        
+        print(f"  板块扫描：共 {len(self.SECTORS)} 个板块，{len(all_codes)} 只成分股")
+        
+        # 2. 一次性批量获取所有股票数据（利用并行优化）
+        try:
+            all_stock_data = data_fetcher.get_stock_data(all_codes, max_workers=10)
+        except Exception as e:
+            print(f"  获取板块数据失败: {e}")
+            return {}
+        
+        print(f"  成功获取 {len(all_stock_data)}/{len(all_codes)} 只股票数据")
+        
+        # 3. 并行计算各板块表现
+        from concurrent.futures import ThreadPoolExecutor, as_completed
+        
+        def calc_single_sector(args):
+            """计算单个板块的表现"""
+            sector_name, codes = args
             try:
-                stock_data = data_fetcher.get_stock_data(codes)
-                
                 total_change = 0
                 up_count = 0
                 leaders = []
+                valid_count = 0
                 
-                for code, data in stock_data.items():
+                for code in codes:
+                    if code not in all_stock_data:
+                        continue
+                    data = all_stock_data[code]
                     change = data.get('change_pct', 0)
                     total_change += change
+                    valid_count += 1
                     
                     if change > 0:
                         up_count += 1
                     
-                    # 记录领涨股
                     leaders.append({
                         'code': code,
                         'name': data.get('name', code),
@@ -163,19 +187,33 @@ class SectorTracker:
                         'current': data.get('current', 0)
                     })
                 
-                avg_change = total_change / len(codes) if codes else 0
+                if valid_count == 0:
+                    return None
+                
+                avg_change = total_change / valid_count
                 leaders.sort(key=lambda x: x['change_pct'], reverse=True)
                 
-                performance[sector_name] = {
+                return sector_name, {
                     'avg_change': avg_change,
                     'up_count': up_count,
-                    'total_count': len(codes),
-                    'leaders': leaders[:3],  # 前3领涨
+                    'total_count': valid_count,
+                    'leaders': leaders[:3],
                     'leader_code': leaders[0]['code'] if leaders else None
                 }
-                
             except Exception as e:
-                print(f"计算板块 {sector_name} 表现失败: {e}")
+                print(f"  计算板块 {sector_name} 失败: {e}")
+                return None
+        
+        # 使用线程池并行计算各板块
+        with ThreadPoolExecutor(max_workers=8) as executor:
+            futures = {executor.submit(calc_single_sector, item): item[0] 
+                      for item in self.SECTORS.items()}
+            
+            for future in as_completed(futures):
+                result = future.result()
+                if result:
+                    sector_name, data = result
+                    performance[sector_name] = data
         
         # 按平均涨幅排序
         self.sector_performance = dict(sorted(
