@@ -57,28 +57,41 @@ def generate_summary():
             all_codes = [p['code'] for p in positions]
             stock_data = data_fetcher.get_stock_data(all_codes)
             
-            total_pnl = 0
+            total_change = 0  # 今日总盈亏金额
             profit_count = 0
             loss_count = 0
             
             for pos in positions:
                 code = pos['code']
-                if code in stock_data:
-                    data = stock_data[code]
-                    current = data['current']
-                    pnl = (current - pos['cost_price']) / pos['cost_price'] * 100
-                    total_pnl += pnl
-                    if pnl >= 0:
-                        profit_count += 1
-                    else:
-                        loss_count += 1
-                    
-                    emoji = "🟢" if pnl >= 0 else "🔴"
-                    print(f"  {emoji} {pos['name']}({code}): {current:.2f} 盈亏 {pnl:+.2f}%")
+                name = pos['name']
+                try:
+                    # 获取K线数据计算昨日和今日价格
+                    klines = data_fetcher._get_kline_eastmoney(code, days=5)
+                    if len(klines) >= 2:
+                        yesterday_close = klines[-2]['close']
+                        today_close = klines[-1]['close']
+                        
+                        # 计算今日涨跌（基于昨日收盘价）
+                        change_pct = (today_close - yesterday_close) / yesterday_close * 100
+                        change_amt = (today_close - yesterday_close) * pos['quantity']
+                        
+                        # 计算总盈亏（基于成本价）
+                        total_pnl = (today_close - pos['cost_price']) / pos['cost_price'] * 100
+                        
+                        total_change += change_amt
+                        if change_pct >= 0:
+                            profit_count += 1
+                        else:
+                            loss_count += 1
+                        
+                        emoji = "🟢" if change_pct >= 0 else "🔴"
+                        print(f"  {emoji} {name}({code}): {today_close:.2f}")
+                        print(f"     今日涨跌: {change_pct:+.2f}% ({change_amt:+.0f}元) | 总盈亏: {total_pnl:+.2f}%")
+                except Exception as e:
+                    print(f"  ⚪ {name}({code}): 数据获取失败")
             
-            avg_pnl = total_pnl / len(positions) if positions else 0
-            print(f"\n  平均盈亏: {avg_pnl:+.2f}%")
-            print(f"  盈利: {profit_count}只 | 亏损: {loss_count}只")
+            print(f"\n  💰 今日总盈亏: {total_change:+.0f}元")
+            print(f"  📊 今日涨跌: 盈利{profit_count}只 | 亏损{loss_count}只")
         
         print(f"\n{'='*60}")
         print(f"✅ 盘后总结生成完成")
