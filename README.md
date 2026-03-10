@@ -1,6 +1,42 @@
-# A-Share Quant Manager V3
+# A-Share Quant Manager V3.2
 
-## 系统架构
+## 🆕 最新更新 (2026-03-10)
+
+### 7项核心优化 (今晚完成)
+
+| 优化项 | 文件 | 功能描述 |
+|:---|:---|:---|
+| **1. 集中配置系统** | `core/config_manager.py` | 统一YAML配置，环境变量覆盖，热更新支持 |
+| **2. 内存缓存优化** | `core/memory_cache_manager.py` | LRU缓存+TTL过期，命中率统计，线程安全 |
+| **3. 分钟级监控** | `core/minute_monitor.py` | 30分钟级别精细监控，回调系统 |
+| **4. 完整回测系统** | `core/enhanced_backtest.py` | 4种策略(均线/突破/RSI/MACD)+参数优化 |
+| **5. ML预测模块** | `core/ml_predictor.py` | 智能预测价格走势，置信度评估 |
+| **6. 完全联动系统** | `core/integrated_system.py` | 统一入口，一键调用所有模块 |
+| **7. 板块轮动监控** | `core/sector_rotation_monitor.py` | AI产业链资金流向追踪 |
+
+### 新增能力
+- **多策略回测**: 突破策略在AI产业链100%有效
+- **ML预测**: 短期方向预测 + 置信度评分
+- **智能预警**: 止损/止盈/波动/突破多维监控
+- **板块轮动**: CPO/AI服务器/芯片实时追踪
+
+## 系统架构 V3.2
+
+```
+配置层 (config_manager) 
+    ↓
+缓存层 (memory_cache_manager - LRU+TTL)
+    ↓
+数据层 (CachedDataFetcher)
+    ↓
+业务层 ├─ 分钟监控 (minute_monitor)
+       ├─ 智能预警 (smart_alert_system)
+       ├─ 策略回测 (enhanced_backtest)
+       ├─ ML预测 (ml_predictor)
+       └─ 板块轮动 (sector_rotation_monitor)
+    ↓
+入口层 (integrated_system / intraday_monitor_integrated)
+```
 
 ### 核心模块
 
