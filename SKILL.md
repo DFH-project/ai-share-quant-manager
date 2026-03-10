@@ -431,3 +431,209 @@ sector.add_sector('低空经济', ['002151', '300900', '002097', '600038'])
 - 🚀 强势买入信号（涨幅>3%）
 - ⏳ 观察等待（涨幅0-3%）
 - ❌ 取消关注（跌幅>5%）
+
+---
+
+## 🆕 2026-03-10 重大更新 - V3.2
+
+### 10. 系统架构全面升级
+
+#### 10.1 集中配置系统 (core/config_manager.py)
+**统一配置管理，支持热更新**
+
+**功能**:
+- **YAML持久化** - 配置存储在 `config/system_config.yaml`
+- **环境变量覆盖** - 生产环境配置优先
+- **配置项包括**: 数据、监控、风险、策略、分析、ML、系统参数
+- **单例模式** - 全局唯一配置实例
+
+**配置示例**:
+```yaml
+risk:
+  stop_loss_pct: -0.08        # 止损线 -8%
+  take_profit_pct: 0.15       # 止盈线 +15%
+  
+monitor:
+  high_frequency_interval: 10      # 高频监控 10分钟
+  medium_frequency_interval: 30    # 中频监控 30分钟
+  low_frequency_interval: 60       # 低频监控 60分钟
+  price_change_threshold: 0.03     # 波动阈值 3%
+```
+
+**使用方式**:
+```python
+from core.config_manager import get_config, cfg
+
+# 获取完整配置
+config = get_config()
+
+# 快速获取配置项
+stop_loss = cfg('risk.stop_loss_pct')  # -0.08
+interval = cfg('monitor.medium_frequency_interval')  # 30
+```
+
+#### 10.2 内存缓存优化 (core/memory_cache_manager.py)
+**高性能LRU缓存，命中率统计**
+
+**功能**:
+- **LRU淘汰** - 自动淘汰最久未使用数据
+- **TTL过期** - 支持按时间过期
+- **线程安全** - 多线程并发安全
+- **命中率统计** - 实时监控缓存效率
+
+**三级缓存实例**:
+```python
+from core.memory_cache_manager import get_price_cache, get_data_cache, get_fundamental_cache
+
+price_cache = get_price_cache()      # 实时价格 (max=500, ttl=60s)
+data_cache = get_data_cache()        # 行情数据 (max=1000, ttl=300s)
+fund_cache = get_fundamental_cache() # 基本面数据 (max=200, ttl=3600s)
+```
+
+**使用方式**:
+```python
+# 存储数据
+cache.set('300750', {'price': 88.19, 'change': 1.82})
+
+# 获取数据
+data = cache.get('300750')
+
+# 查看统计
+stats = cache.get_stats()
+print(f"命中率: {stats['hit_rate']}, 条目数: {stats['size']}")
+```
+
+#### 10.3 增强版回测系统 (core/enhanced_backtest.py)
+**4种策略 + 参数优化**
+
+**内置策略**:
+| 策略 | 函数 | 适用场景 |
+|------|------|----------|
+| 均线交叉 | `StrategyLibrary.ma_cross` | 趋势股 |
+| 突破策略 | `StrategyLibrary.breakout` | 强势股 |
+| RSI策略 | `StrategyLibrary.rsi_strategy` | 震荡股 |
+| MACD策略 | `StrategyLibrary.macd_strategy` | 趋势确认 |
+
+**快速回测**:
+```python
+from core.enhanced_backtest import quick_backtest
+
+# 单策略回测
+result = quick_backtest('300750', 'breakout', lookback=20)
+print(f"收益: {result.total_return*100:.1f}%, 夏普: {result.sharpe_ratio:.2f}")
+```
+
+**参数优化**:
+```python
+from core.enhanced_backtest import EnhancedBacktester, StrategyLibrary
+
+backtester = EnhancedBacktester()
+results = backtester.optimize_params(
+    '300750', '2024-01-01', '2024-12-31',
+    StrategyLibrary.ma_cross,
+    {'short': [5, 10], 'long': [20, 30]}
+)
+# 返回按夏普排序的结果列表
+```
+
+#### 10.4 ML预测模块 (core/ml_predictor.py)
+**智能预测价格走势**
+
+**功能**:
+- **方向预测** - UP/DOWN/SIDEWAYS
+- **预期收益** - 未来5日收益率预测
+- **置信度评估** - 0-100%置信度
+- **特征分析** - 价格变化、量比、波动率、均线、RSI、MACD
+
+**使用方式**:
+```python
+from core.ml_predictor import MLPredictor
+
+predictor = MLPredictor()
+
+# 单股预测
+result = predictor.predict('300750')
+print(f"{result.name}: {result.direction}, 预期{result.expected_return*100:+.1f}%, 置信{result.confidence*100:.0f}%")
+
+# 批量预测
+results = predictor.batch_predict(['300750', '002594', '601138'])
+for r in results:
+    print(f"{r.name}: {r.direction} {r.expected_return*100:+.1f}%")
+```
+
+#### 10.5 完全联动系统 (core/integrated_system.py)
+**统一入口，一键调用所有模块**
+
+**功能**:
+- **全方位分析** - 回测 + ML预测 + 智能预警 + 缓存统计
+- **组合优化** - 风险收益平衡建议
+- **完整监控** - 实时行情 + 预警检查 + ML分析
+- **系统状态** - 配置、缓存、自选股总览
+
+**使用方式**:
+```python
+from core.integrated_system import IntegratedQuantSystem
+
+system = IntegratedQuantSystem()
+
+# 全方位分析单股
+system.analyze_stock('300750')
+
+# 组合优化
+system.optimize_portfolio()
+
+# 完整监控
+system.run_complete_monitoring()
+
+# 系统状态
+system.display_system_status()
+```
+
+#### 10.6 板块轮动监控 (core/sector_rotation_monitor.py)
+**AI产业链资金流向实时追踪**
+
+**监控板块**:
+- CPO光模块
+- AI服务器
+- AI芯片
+- 半导体设备
+- 芯片制造
+
+**使用方式**:
+```bash
+# 实时监控板块轮动
+python3 core/sector_rotation_monitor.py
+```
+
+**输出示例**:
+```
+🔄 AI产业链板块轮动监控
+🥇 CPO光模块    📈 +7.09% (4/4只涨)
+   龙头: 天孚通信(🔥+10.9%), 光迅科技(🔥+10.0%)
+🥈 芯片制造      📈 +2.83% (2/2只涨)
+🥉 AI服务器     📊 +1.72% (3/3只涨)
+
+💰 资金流向分析:
+   🔥 资金流入: CPO光模块 (+7.1%)
+
+🎯 轮动策略建议:
+   强势板块: CPO光模块, 芯片制造 - 可追涨
+```
+
+---
+
+## 系统版本历史
+
+| 版本 | 日期 | 主要更新 |
+|------|------|----------|
+| V3.2 | 2026-03-10 | 7项核心优化：配置系统、内存缓存、回测系统、ML预测、联动系统、板块轮动 |
+| V3.1 | 2026-03-09 | AI风险管控、智能调仓、LLM选股理由 |
+| V3.0 | 2026-03-08 | 数据管理器、并行分析、整合监控 |
+| V2.0 | 2026-03-07 | V2自选股分级管理、策略联动 |
+| V1.0 | 2026-03-06 | 基础监控、自选股管理 |
+
+---
+
+**当前版本**: V3.2  
+**最后更新**: 2026-03-10 23:30  
+**代码状态**: ✅ 已推送至GitHub
