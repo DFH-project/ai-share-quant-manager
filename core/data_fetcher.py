@@ -76,7 +76,14 @@ class DataFetcher:
             pass
     
     def _merge_stock_data(self, real_time: Dict, cached: Dict) -> Dict:
-        """合并实时数据和缓存数据"""
+        """
+        合并实时数据和缓存数据 - 智能合并
+        
+        策略：
+        1. 实时数据覆盖缓存（价格和基础数据）
+        2. 缓存补充缺失的技术指标（K线类数据变化较慢，可复用）
+        3. 标记数据来源，便于调试
+        """
         if not cached:
             return real_time
         if not real_time:
@@ -84,11 +91,16 @@ class DataFetcher:
         
         merged = real_time.copy()
         
-        # 用缓存补充缺失的技术指标
-        for key in ['high_20d', 'low_20d', 'ma30', 'ma60', 'volume_ratio']:
-            if key not in merged or merged[key] == 0 or merged[key] is None:
+        # 用缓存补充缺失的技术指标（K线类数据可以跨天复用）
+        technical_keys = ['high_20d', 'low_20d', 'ma5', 'ma10', 'ma20', 'ma30', 'ma60', 'volume_ratio']
+        for key in technical_keys:
+            if key not in merged or merged[key] in [0, None]:
                 if key in cached and cached[key] not in [0, None]:
                     merged[key] = cached[key]
+                    merged[f'{key}_source'] = 'cache'
+        
+        # 添加合并标记
+        merged['_data_merged'] = True
         
         return merged
         
@@ -158,8 +170,8 @@ class DataFetcher:
                 # 1. 加载缓存
                 cached_data = self._load_cache(code)
                 
-                # 2. 获取实时数据（多源合并）
-                real_time_data = self._fetch_stock_merged(code)
+                # 2. 获取实时数据（多源合并）- 获取完整数据（含技术指标）
+                real_time_data = self._fetch_stock_merged(code, primary_only=False)
                 
                 # 3. 合并数据
                 if real_time_data:
@@ -196,9 +208,14 @@ class DataFetcher:
         """获取实时数据 - 优化版
         策略：
         - primary_only=True: 只使用腾讯（最快）
-        - primary_only=False: 腾讯+东财双源合并
+        - primary_only=False: 腾讯+新浪双源合并（含技术指标）
         
-        已移除AKShare（太慢），保留东财作为兜底
+        数据源：
+        1. 腾讯（主）：基础数据最快
+        2. 新浪财经（辅）：实时数据
+        3. 东方财富（兜底）：技术指标（K线数据）
+        
+        已移除AKShare（太慢）
         """
         merged_data = {}
         
@@ -210,22 +227,30 @@ class DataFetcher:
         except Exception as e:
             print(f"  [实时] {code}: 腾讯失败 - {str(e)[:30]}")
         
-        # 如果腾讯成功且只需要主源，直接返回
+        # 腾讯失败，尝试新浪
+        if not merged_data:
+            try:
+                data = self._get_stock_sina([code])
+                if data and code in data:
+                    print(f"  [实时] {code}: 新浪兜底成功")
+                    merged_data = data[code].copy()
+            except Exception as e:
+                print(f"  [实时] {code}: 新浪失败 - {str(e)[:30]}")
+        
+        # 如果只需要主源（基础数据），直接返回
         if merged_data and primary_only:
             return merged_data
         
-        # 腾讯失败或需要双源，尝试东财
-        if not merged_data or not primary_only:
+        # 需要完整数据（含技术指标）
+        if merged_data:
+            # 尝试从东财获取技术指标（K线数据）
             try:
-                data = self._get_stock_eastmoney([code])
-                if data and code in data:
-                    print(f"  [实时] {code}: 东财兜底成功")
-                    # 合并数据
-                    for key, value in data[code].items():
-                        if value not in [0, None, ''] or key not in merged_data:
-                            merged_data[key] = value
+                indicators = self._get_technical_indicators(code)
+                if indicators:
+                    merged_data.update(indicators)
+                    print(f"  [实时] {code}: 技术指标补充成功")
             except Exception as e:
-                print(f"  [实时] {code}: 东财失败 - {str(e)[:30]}")
+                print(f"  [实时] {code}: 技术指标获取失败 - {str(e)[:30]}")
         
         if merged_data:
             return merged_data
@@ -408,49 +433,141 @@ class DataFetcher:
         
         return result
     
-    def _get_stock_akshare(self, codes: List[str]) -> Dict:
-        """AKShare个股 - 真实数据"""
+    def _get_stock_sina(self, codes: List[str]) -> Dict:
+        """新浪财经个股 - 真实数据，含技术指标"""
+        result = {}
+        for code in codes:
+            try:
+                sina_code = f"sh{code}" if code.startswith('6') else f"sz{code}"
+                url = f"https://hq.sinajs.cn/list={sina_code}"
+                resp = self.session.get(url, timeout=5)
+                resp.encoding = 'gb2312'
+                
+                # 解析新浪数据格式
+                if 'var hq_str_' in resp.text:
+                    data_str = resp.text.split('="')[1].strip('";')
+                    data = data_str.split(',')
+                    if len(data) >= 33:
+                        result[code] = {
+                            'name': data[0],
+                            'open': float(data[1]),
+                            'prev_close': float(data[2]),
+                            'current': float(data[3]),
+                            'high': float(data[4]),
+                            'low': float(data[5]),
+                            'volume': float(data[8]),
+                            'change_pct': (float(data[3]) / float(data[2]) - 1) * 100 if float(data[2]) > 0 else 0,
+                            'bid1': float(data[11]),  # 买一价
+                            'ask1': float(data[21]),  # 卖一价
+                        }
+            except Exception as e:
+                continue
+        
+        if not result:
+            raise Exception("新浪返回空数据")
+        
+        return result
+    
+    def _get_kline_eastmoney(self, code: str, days: int = 20) -> List[Dict]:
+        """
+        东方财富K线数据 - 主要技术指标来源
+        用于计算技术指标（20日高低点、均线、量比等）
+        """
         try:
-            import akshare as ak
+            secid = f"1.{code}" if code.startswith('6') else f"0.{code}"
+            url = "https://push2his.eastmoney.com/api/qt/stock/kline/get"
+            params = {
+                'secid': secid,
+                'ut': 'fa5fd1943c7b386f172d6893dbfba10b',
+                'fields1': 'f1,f2,f3,f4,f5,f6',
+                'fields2': 'f51,f52,f53,f54,f55,f56,f57',
+                'klt': '101',  # 日K
+                'fqt': '1',    # 前复权
+                'end': '20500101',
+                'lmt': str(days + 5)  # 多取几天确保有足够数据
+            }
+            resp = self.session.get(url, params=params, timeout=10)
+            data = resp.json()
             
-            # 获取全市场数据
-            sh_df = ak.stock_sh_a_spot_em()
-            sz_df = ak.stock_sz_a_spot_em()
-            import pandas as pd
-            all_df = pd.concat([sh_df, sz_df], ignore_index=True)
+            if data and data.get('data') and data['data'].get('klines'):
+                klines = data['data']['klines']
+                result = []
+                for k in klines[-days:]:
+                    # 格式: date,open,close,low,high,volume,amount
+                    parts = k.split(',')
+                    if len(parts) >= 6:
+                        result.append({
+                            'date': parts[0],
+                            'open': float(parts[1]),
+                            'close': float(parts[2]),
+                            'low': float(parts[3]),
+                            'high': float(parts[4]),
+                            'volume': float(parts[5])
+                        })
+                return result
             
-            result = {}
-            for code in codes:
-                stock = all_df[all_df['代码'] == code]
-                if not stock.empty:
-                    result[code] = {
-                        'name': stock.iloc[0]['名称'],
-                        'current': float(stock.iloc[0]['最新价']),
-                        'change_pct': float(stock.iloc[0]['涨跌幅'])
-                    }
-            
-            if not result:
-                raise Exception("AKShare返回空数据")
-            
-            return result
+            return []
         except Exception as e:
-            raise Exception(f"AKShare获取失败: {e}")
+            return []
+
+    def _get_kline_sina(self, code: str, days: int = 20) -> List[Dict]:
+        """
+        获取新浪K线数据（备用）
+        新浪接口已失效，直接使用东财
+        """
+        return self._get_kline_eastmoney(code, days)
+    
+    def _get_technical_indicators(self, code: str) -> Dict:
+        """
+        计算技术指标（基于K线数据）
+        返回：20日高低点、均线、量比等
+        """
+        try:
+            klines = self._get_kline_sina(code, days=25)
+            if len(klines) < 20:
+                return {}
+            
+            closes = [k['close'] for k in klines]
+            volumes = [k['volume'] for k in klines]
+            
+            # 最近20日
+            recent_20 = closes[-20:]
+            recent_5 = closes[-5:]
+            
+            # 计算指标
+            high_20d = max([k['high'] for k in klines[-20:]])
+            low_20d = min([k['low'] for k in klines[-20:]])
+            ma5 = sum(recent_5) / len(recent_5)
+            ma20 = sum(recent_20) / len(recent_20)
+            
+            # 量比（今日成交量 / 近5日平均）
+            today_volume = volumes[-1]
+            avg_5d_volume = sum(volumes[-6:-1]) / 5 if len(volumes) >= 6 else today_volume
+            volume_ratio = today_volume / avg_5d_volume if avg_5d_volume > 0 else 1
+            
+            return {
+                'high_20d': high_20d,
+                'low_20d': low_20d,
+                'ma5': ma5,
+                'ma20': ma20,
+                'volume_ratio': volume_ratio
+            }
+        except Exception as e:
+            return {}
+    
+    def _get_stock_akshare(self, codes: List[str]) -> Dict:
+        """AKShare个股 - 已禁用，使用新浪财经替代"""
+        raise Exception("AKShare已禁用，使用新浪财经替代")
     
     def get_fundamental_data(self, code: str) -> Dict:
         """
         获取基本面数据 - 真实PE/PB/ROE等
-        多数据源：AKShare → 东方财富
+        多数据源：东方财富（优先）
         失败时报错，绝不生成假数据
         """
         errors = []
         
-        # 尝试1: AKShare
-        try:
-            return self._get_fundamental_akshare(code)
-        except Exception as e:
-            errors.append(f"AKShare基本面: {e}")
-        
-        # 尝试2: 东方财富
+        # 尝试1: 东方财富（最稳定）
         try:
             return self._get_fundamental_eastmoney(code)
         except Exception as e:
@@ -462,51 +579,8 @@ class DataFetcher:
         raise Exception(error_msg)
     
     def _get_fundamental_akshare(self, code: str) -> Dict:
-        """AKShare基本面数据 - 真实数据"""
-        import akshare as ak
-        
-        # 获取个股指标
-        df = ak.stock_individual_info_em(symbol=code)
-        if df is None or df.empty:
-            raise Exception("AKShare返回空数据")
-        
-        result = {}
-        for _, row in df.iterrows():
-            key = row.get('item', '')
-            value = row.get('value', '')
-            
-            if '市盈率' in key or 'PE' in key:
-                try:
-                    result['pe'] = float(value)
-                except:
-                    pass
-            elif '市净率' in key or 'PB' in key:
-                try:
-                    result['pb'] = float(value)
-                except:
-                    pass
-            elif 'ROE' in key or '净资产收益率' in key:
-                try:
-                    result['roe'] = float(value)
-                except:
-                    pass
-            elif '总市值' in key:
-                try:
-                    result['market_cap'] = float(value)
-                except:
-                    pass
-            elif '流通市值' in key:
-                try:
-                    result['float_cap'] = float(value)
-                except:
-                    pass
-            elif '所属行业' in key:
-                result['industry'] = str(value)
-        
-        if not result:
-            raise Exception("AKShare基本面数据解析失败")
-        
-        return result
+        """AKShare基本面数据 - 已禁用"""
+        raise Exception("AKShare已禁用")
     
     def _get_fundamental_eastmoney(self, code: str) -> Dict:
         """东方财富基本面数据 - 真实数据"""
