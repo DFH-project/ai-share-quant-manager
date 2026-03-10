@@ -1,7 +1,12 @@
 #!/usr/bin/env python3
 """
-intraday_monitor_integrated.py - 整合版盘中监控
-结合V1的板块扫描和V2的自选股分级管理
+intraday_monitor_integrated.py - 整合版盘中监控 v2.5
+集成所有新模块:
+- 配置管理
+- 内存缓存
+- 智能预警
+- 回测验证
+- ML预测
 """
 
 import sys
@@ -9,13 +14,17 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from core.data_fetcher import data_fetcher
-from core.watchlist_memory import get_watchlist_memory  # V1兼容
+from core.watchlist_memory import get_watchlist_memory
 from core.watchlist_memory_v2 import get_watchlist_memory_v2, migrate_from_v1
 from core.sector_tracker import get_sector_tracker
 from core.auto_watchlist_manager import get_auto_manager
 from core.multi_dimension_analyzer import get_analyzer
 from core.intraday_monitor_v2 import IntradayMonitorV2
-from core.smart_alert_system import SmartAlertSystem  # 智能预警系统
+from core.smart_alert_system import SmartAlertSystem
+from core.config_manager import get_config, cfg  # 配置管理
+from core.memory_cache_manager import CachedDataFetcher, get_data_cache  # 内存缓存
+from core.enhanced_backtest import quick_backtest  # 回测
+from core.ml_predictor import MLPredictor  # ML预测
 from typing import List, Dict
 from datetime import datetime
 import json
@@ -25,13 +34,18 @@ class IntegratedIntradayMonitor:
     """整合版盘中监控 - V1+V2"""
     
     def __init__(self):
-        self.watchlist_v1 = get_watchlist_memory()  # 兼容V1
-        self.watchlist_v2 = get_watchlist_memory_v2()  # V2分级管理
+        self.watchlist_v1 = get_watchlist_memory()
+        self.watchlist_v2 = get_watchlist_memory_v2()
         self.sector_tracker = get_sector_tracker()
         self.auto_manager = get_auto_manager()
         self.analyzer = get_analyzer()
         self.monitor_v2 = IntradayMonitorV2()
-        self.alert_system = SmartAlertSystem()  # 智能预警系统
+        self.alert_system = SmartAlertSystem()
+        
+        # 新增模块
+        self.config = get_config()  # 配置管理
+        self.cached_fetcher = CachedDataFetcher()  # 缓存数据获取
+        self.ml_predictor = MLPredictor()  # ML预测
         
         # 确保V2数据已迁移
         if len(self.watchlist_v2.get_all()) == 0 and len(self.watchlist_v1.get_all()) > 0:
