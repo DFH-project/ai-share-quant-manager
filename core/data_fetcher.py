@@ -372,7 +372,8 @@ class DataFetcher:
         """腾讯个股 - 真实数据"""
         tencent_codes = []
         for code in codes:
-            if code.startswith('6'):
+            # 6开头=沪市股票, 5开头=沪市ETF/基金, 其他=深市
+            if code.startswith(('6', '5')):
                 tencent_codes.append(f'sh{code}')
             else:
                 tencent_codes.append(f'sz{code}')
@@ -405,7 +406,8 @@ class DataFetcher:
         """东方财富个股 - 真实数据"""
         result = {}
         for code in codes:
-            secid = f"1.{code}" if code.startswith('6') else f"0.{code}"
+            # 6开头=沪市股票, 5开头=沪市ETF/基金, 其他=深市
+            secid = f"1.{code}" if code.startswith(('6', '5')) else f"0.{code}"
             url = "https://push2.eastmoney.com/api/qt/stock/get"
             params = {
                 'ut': 'fa5fd1943c7b386f172d6893dbfba10b',
@@ -438,7 +440,9 @@ class DataFetcher:
         result = {}
         for code in codes:
             try:
-                sina_code = f"sh{code}" if code.startswith('6') else f"sz{code}"
+                # 6开头=沪市股票, 5开头=沪市ETF/基金, 其他=深市
+                prefix = 'sh' if code.startswith(('6', '5')) else 'sz'
+                sina_code = f"{prefix}{code}"
                 url = f"https://hq.sinajs.cn/list={sina_code}"
                 resp = self.session.get(url, timeout=5)
                 resp.encoding = 'gb2312'
@@ -474,7 +478,8 @@ class DataFetcher:
         用于计算技术指标（20日高低点、均线、量比等）
         """
         try:
-            secid = f"1.{code}" if code.startswith('6') else f"0.{code}"
+            # 6开头=沪市股票, 5开头=沪市ETF/基金, 其他=深市
+            secid = f"1.{code}" if code.startswith(('6', '5')) else f"0.{code}"
             url = "https://push2his.eastmoney.com/api/qt/stock/kline/get"
             params = {
                 'secid': secid,
