@@ -1,0 +1,29 @@
+{
+  "review_time": "2026-03-13T15:28:55.013233",
+  "cache_health": {
+    "l1_memory_cache": 0,
+    "l1_file_cache": 0,
+    "l2_technical_cache": 0,
+    "l2_status": "❌ 不存在",
+    "l3_fundamental_cache": 2,
+    "l3_status": "❌ 读取失败"
+  },
+  "data_availability": {
+    "test_codes": [
+      "000977",
+      "603019",
+      "300750",
+      "002594",
+      "513180"
+    ],
+    "success_count": 5,
+    "fail_list": [],
+    "success_rate": 100.0
+  },
+  "code_structure": {
+    "key_files_exist": 4,
+    "total_key_files": 4,
+    "issues": []
+  },
+  "overall_score": 100
+}

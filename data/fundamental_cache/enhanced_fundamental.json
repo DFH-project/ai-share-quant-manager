@@ -1,0 +1,434 @@
+{
+  "002085": {
+    "code": "002085",
+    "update_time": "2026-03-13T09:33:32.865180",
+    "name": "万丰奥威",
+    "industry": "汽车零部件",
+    "total_market_cap": 33909061394.4,
+    "float_market_cap": 33909061394.4,
+    "research_count": 58
+  },
+  "600438": {
+    "code": "600438",
+    "update_time": "2026-03-13T09:33:39.689228",
+    "name": "通威股份",
+    "industry": "光伏设备",
+    "total_market_cap": 87383627627.49,
+    "float_market_cap": 87383627627.49,
+    "research_count": 320
+  },
+  "603019": {
+    "code": "603019",
+    "update_time": "2026-03-13T09:33:47.233397",
+    "name": "中科曙光",
+    "industry": "计算机设备",
+    "total_market_cap": 133143536344.0,
+    "float_market_cap": 133106324624.0,
+    "research_count": 112
+  },
+  "603486": {
+    "code": "603486",
+    "update_time": "2026-03-13T09:33:53.966886",
+    "name": "科沃斯",
+    "industry": "小家电",
+    "total_market_cap": 37398316367.6,
+    "float_market_cap": 37038487907.6,
+    "research_count": 128
+  },
+  "601138": {
+    "code": "601138",
+    "update_time": "2026-03-13T09:34:01.273537",
+    "name": "工业富联",
+    "industry": "消费电子",
+    "total_market_cap": 1042555278502.5,
+    "float_market_cap": 1042555278502.5,
+    "research_count": 108
+  },
+  "600276": {
+    "code": "600276",
+    "update_time": "2026-03-13T09:34:07.646280",
+    "name": "恒瑞医药",
+    "industry": "化学制药",
+    "total_market_cap": 367700873019.6,
+    "float_market_cap": 353396725979.6,
+    "research_count": 291
+  },
+  "002281": {
+    "code": "002281",
+    "update_time": "2026-03-13T09:34:14.719003",
+    "name": "光迅科技",
+    "industry": "通信设备",
+    "total_market_cap": 74399704606.96,
+    "float_market_cap": 71891196820.57,
+    "research_count": 111
+  },
+  "000938": {
+    "code": "000938",
+    "update_time": "2026-03-13T09:34:21.135955",
+    "name": "紫光股份",
+    "industry": "IT服务Ⅱ",
+    "total_market_cap": 75248701484.94,
+    "float_market_cap": 75248701484.94,
+    "research_count": 119
+  },
+  "002896": {
+    "code": "002896",
+    "update_time": "2026-03-13T09:34:27.919524",
+    "name": "中大力德",
+    "industry": "通用设备",
+    "total_market_cap": 15334663940.1,
+    "float_market_cap": 15334663940.1,
+    "research_count": 25
+  },
+  "002371": {
+    "code": "002371",
+    "update_time": "2026-03-13T09:34:34.969267",
+    "name": "北方华创",
+    "industry": "半导体",
+    "total_market_cap": 333104077008.96,
+    "float_market_cap": 332837830003.84,
+    "research_count": 269
+  },
+  "002151": {
+    "code": "002151",
+    "update_time": "2026-03-13T09:34:41.232578",
+    "name": "北斗星通",
+    "industry": "军工电子Ⅱ",
+    "total_market_cap": 23323452822.48,
+    "float_market_cap": 19023498311.52,
+    "research_count": 12
+  },
+  "002074": {
+    "code": "002074",
+    "update_time": "2026-03-13T09:34:48.195433",
+    "name": "国轩高科",
+    "industry": "电池",
+    "total_market_cap": 70859285184.24,
+    "float_market_cap": 67815674128.44,
+    "research_count": 121
+  },
+  "002156": {
+    "code": "002156",
+    "update_time": "2026-03-13T09:34:55.305585",
+    "name": "通富微电",
+    "industry": "半导体",
+    "total_market_cap": 70021921519.68001,
+    "float_market_cap": 70015245523.08,
+    "research_count": 119
+  },
+  "600584": {
+    "code": "600584",
+    "update_time": "2026-03-13T09:35:02.259106",
+    "name": "长电科技",
+    "industry": "半导体",
+    "total_market_cap": 81418362935.0,
+    "float_market_cap": 81418362935.0,
+    "research_count": 130
+  },
+  "300775": {
+    "code": "300775",
+    "update_time": "2026-03-13T09:35:09.286647",
+    "name": "三角防务",
+    "industry": "航空装备Ⅱ",
+    "total_market_cap": 20352368898.54,
+    "float_market_cap": 19758990215.16,
+    "research_count": 27
+  },
+  "300014": {
+    "code": "300014",
+    "update_time": "2026-03-13T09:35:20.505177",
+    "name": "亿纬锂能",
+    "industry": "电池",
+    "total_market_cap": 143072873064.12,
+    "float_market_cap": 137946966573.9,
+    "research_count": 294
+  },
+  "300760": {
+    "code": "300760",
+    "update_time": "2026-03-13T09:35:26.470788",
+    "name": "迈瑞医疗",
+    "industry": "医疗器械",
+    "total_market_cap": 215814568132.0,
+    "float_market_cap": 215808200182.0,
+    "research_count": 297
+  },
+  "600196": {
+    "code": "600196",
+    "update_time": "2026-03-13T09:35:32.654523",
+    "name": "复星医药",
+    "industry": "化学制药",
+    "total_market_cap": 68630033652.5,
+    "float_market_cap": 54445162802.5,
+    "research_count": 102
+  },
+  "000099": {
+    "code": "000099",
+    "update_time": "2026-03-13T09:35:38.919200",
+    "name": "中信海直",
+    "industry": "航空机场",
+    "total_market_cap": 15748133781.1,
+    "float_market_cap": 15748133781.1,
+    "research_count": 3
+  },
+  "000988": {
+    "code": "000988",
+    "update_time": "2026-03-13T09:35:45.365378",
+    "name": "华工科技",
+    "industry": "自动化设备",
+    "total_market_cap": 126059874376.59001,
+    "float_market_cap": 125995051818.09001,
+    "research_count": 59
+  },
+  "300750": {
+    "code": "300750",
+    "update_time": "2026-03-13T09:35:51.400337",
+    "name": "宁德时代",
+    "industry": "电池",
+    "total_market_cap": 1821120629512.68,
+    "float_market_cap": 1698526590738.7798,
+    "research_count": 462
+  },
+  "603659": {
+    "code": "603659",
+    "update_time": "2026-03-13T09:35:58.502260",
+    "name": "璞泰来",
+    "industry": "电池",
+    "total_market_cap": 67232478921.72,
+    "float_market_cap": 67232478921.72,
+    "research_count": 182
+  },
+  "600733": {
+    "code": "600733",
+    "update_time": "2026-03-13T09:36:05.419708",
+    "name": "北汽蓝谷",
+    "industry": "乘用车",
+    "total_market_cap": 49536457824.36,
+    "float_market_cap": 38057518745.380005,
+    "research_count": 26
+  },
+  "002709": {
+    "code": "002709",
+    "update_time": "2026-03-13T09:36:12.239262",
+    "name": "天赐材料",
+    "industry": "电池",
+    "total_market_cap": 99396281856.68999,
+    "float_market_cap": 73522371169.89,
+    "research_count": 209
+  },
+  "300450": {
+    "code": "300450",
+    "update_time": "2026-03-13T09:36:19.232731",
+    "name": "先导智能",
+    "industry": "电池",
+    "total_market_cap": 87293905568.76,
+    "float_market_cap": 81307864886.82,
+    "research_count": 265
+  },
+  "300073": {
+    "code": "300073",
+    "update_time": "2026-03-13T10:01:38.116362",
+    "name": "当升科技",
+    "industry": "电池",
+    "total_market_cap": 30850565102.24,
+    "float_market_cap": 28678453964.16,
+    "research_count": 296
+  },
+  "002594": {
+    "code": "002594",
+    "update_time": "2026-03-13T10:01:45.186561",
+    "name": "比亚迪",
+    "industry": "乘用车",
+    "total_market_cap": 913360852061.7001,
+    "float_market_cap": 349351885828.14,
+    "research_count": 532
+  },
+  "300418": {
+    "code": "300418",
+    "update_time": "2026-03-13T10:01:52.772868",
+    "name": "昆仑万维",
+    "industry": "数字媒体",
+    "total_market_cap": 65228347277.880005,
+    "float_market_cap": 65183336927.880005,
+    "research_count": 101
+  },
+  "300124": {
+    "code": "300124",
+    "update_time": "2026-03-13T10:01:59.275900",
+    "name": "汇川技术",
+    "industry": "自动化设备",
+    "total_market_cap": 193187833752.32,
+    "float_market_cap": 171161724564.48,
+    "research_count": 275
+  },
+  "603160": {
+    "code": "603160",
+    "update_time": "2026-03-13T10:02:05.232439",
+    "name": "汇顶科技",
+    "industry": "半导体",
+    "total_market_cap": 33420431017.26,
+    "float_market_cap": 33420431017.26,
+    "research_count": 50
+  },
+  "300502": {
+    "code": "300502",
+    "update_time": "2026-03-13T10:02:11.877548",
+    "name": "新易盛",
+    "industry": "通信设备",
+    "total_market_cap": 388458839129.60004,
+    "float_market_cap": 346021796785.60004,
+    "research_count": 95
+  },
+  "601012": {
+    "code": "601012",
+    "update_time": "2026-03-13T10:02:18.108607",
+    "name": "隆基绿能",
+    "industry": "光伏设备",
+    "total_market_cap": 145195710819.24,
+    "float_market_cap": 145195566237.88,
+    "research_count": 346
+  },
+  "688169": {
+    "code": "688169",
+    "update_time": "2026-03-13T10:02:25.733164",
+    "name": "石头科技",
+    "industry": "小家电",
+    "total_market_cap": 33994755481.6,
+    "float_market_cap": 33994755481.6,
+    "research_count": 199
+  },
+  "603259": {
+    "code": "603259",
+    "update_time": "2026-03-13T10:02:31.926898",
+    "name": "药明康德",
+    "industry": "医疗服务",
+    "total_market_cap": 272566216109.24997,
+    "float_market_cap": 225934150472.09998,
+    "research_count": 257
+  },
+  "300900": {
+    "code": "300900",
+    "update_time": "2026-03-13T10:02:38.625416",
+    "name": "广联航空",
+    "industry": "航空装备Ⅱ",
+    "total_market_cap": 12922185065.65,
+    "float_market_cap": 10114303153.15,
+    "research_count": 13
+  },
+  "300308": {
+    "code": "300308",
+    "update_time": "2026-03-13T10:02:45.163757",
+    "name": "中际旭创",
+    "industry": "通信设备",
+    "total_market_cap": 603937259262.36,
+    "float_market_cap": 600883731986.2799,
+    "research_count": 283
+  },
+  "002466": {
+    "code": "002466",
+    "update_time": "2026-03-13T10:02:52.165241",
+    "name": "天齐锂业",
+    "industry": "能源金属",
+    "total_market_cap": 94628346757.18001,
+    "float_market_cap": 81848923625.64,
+    "research_count": 93
+  },
+  "002050": {
+    "code": "002050",
+    "update_time": "2026-03-13T10:35:19.177958",
+    "name": "三花智控",
+    "industry": "家电零部件Ⅱ",
+    "total_market_cap": 201521787347.15,
+    "float_market_cap": 176436219855.37,
+    "research_count": 221
+  },
+  "002230": {
+    "code": "002230",
+    "update_time": "2026-03-13T10:35:31.504319",
+    "name": "科大讯飞",
+    "industry": "软件开发",
+    "total_market_cap": 120978979308.69,
+    "float_market_cap": 114563474112.29,
+    "research_count": 203
+  },
+  "600460": {
+    "code": "600460",
+    "update_time": "2026-03-13T10:35:38.814551",
+    "name": "士兰微",
+    "industry": "半导体",
+    "total_market_cap": 48391209252.6,
+    "float_market_cap": 48391209252.6,
+    "research_count": 86
+  },
+  "002747": {
+    "code": "002747",
+    "update_time": "2026-03-13T10:35:44.851436",
+    "name": "埃斯顿",
+    "industry": "自动化设备",
+    "total_market_cap": 21214142089.760002,
+    "float_market_cap": 17150320953.760002,
+    "research_count": 154
+  },
+  "600756": {
+    "code": "600756",
+    "update_time": "2026-03-13T10:35:51.456044",
+    "name": "浪潮软件",
+    "industry": "IT服务Ⅱ",
+    "total_market_cap": 5555600885.17,
+    "float_market_cap": 5149929185.17,
+    "research_count": 1
+  },
+  "000538": {
+    "code": "000538",
+    "update_time": "2026-03-13T10:35:58.029639",
+    "name": "云南白药",
+    "industry": "中药Ⅱ",
+    "total_market_cap": 100436141922.87,
+    "float_market_cap": 99790580677.06,
+    "research_count": 48
+  },
+  "603127": {
+    "code": "603127",
+    "update_time": "2026-03-13T10:36:12.495314",
+    "name": "昭衍新药",
+    "industry": "医疗服务",
+    "total_market_cap": 24533660722.800003,
+    "float_market_cap": 20637757678.36,
+    "research_count": 128
+  },
+  "300394": {
+    "code": "300394",
+    "update_time": "2026-03-13T10:36:19.301905",
+    "name": "天孚通信",
+    "industry": "通信设备",
+    "total_market_cap": 256850436227.49,
+    "float_market_cap": 256333869810.53998,
+    "research_count": 146
+  },
+  "300769": {
+    "code": "300769",
+    "update_time": "2026-03-13T10:36:25.381175",
+    "name": "德方纳米",
+    "industry": "电池",
+    "total_market_cap": 13350959629.5,
+    "float_market_cap": 11996243826.699999,
+    "research_count": 80
+  },
+  "688981": {
+    "code": "688981",
+    "update_time": "2026-03-13T10:36:33.675588",
+    "name": "中芯国际",
+    "industry": "半导体",
+    "total_market_cap": 855995785987.68,
+    "float_market_cap": 213913201492.02002,
+    "research_count": 103
+  },
+  "002097": {
+    "code": "002097",
+    "update_time": "2026-03-13T11:08:24.689053",
+    "name": "山河智能",
+    "industry": "工程机械",
+    "total_market_cap": 11885266939.84,
+    "float_market_cap": 11864052477.34,
+    "research_count": 5
+  }
+}

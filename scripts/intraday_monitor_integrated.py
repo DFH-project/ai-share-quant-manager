@@ -228,7 +228,7 @@ class IntegratedIntradayMonitor:
         }
     
     def quick_monitor(self):
-        """快速监控模式 - 只监控特别关注股票 + 智能预警检查"""
+        """快速监控模式 - 只监控特别关注股票 + 智能预警检查 + 买入信号检测"""
         print("\n" + "="*80)
         print(f"⚡ 快速监控模式 - {datetime.now().strftime('%H:%M:%S')}")
         print("="*80)
@@ -238,7 +238,7 @@ class IntegratedIntradayMonitor:
         
         if not high_items:
             print("暂无特别关注股票")
-            return
+            return []
         
         print(f"\n🔴 特别关注 ({len(high_items)}只):")
         
@@ -246,6 +246,8 @@ class IntegratedIntradayMonitor:
         stock_data = data_fetcher.get_stock_data(codes)
         
         alerts = []
+        buy_signals = []  # 买入信号单独收集
+        
         for item in high_items:
             if item.code not in stock_data:
                 continue
@@ -256,8 +258,73 @@ class IntegratedIntradayMonitor:
             
             emoji = item.get_strategy_emoji()
             
-            # 重要波动提醒
-            if abs(change_pct) >= 3:
+            # ========== 买入信号检测 ==========
+            # 根据策略类型检测买入信号
+            buy_signal = None
+            
+            if item.strategy_type == '追涨型' and change_pct > 3:
+                strength = '强' if change_pct > 5 else '中等'
+                position = '30%' if change_pct > 5 else '20%'
+                stop_loss = price * 0.95  # 止损位-5%
+                
+                buy_signal = {
+                    'type': 'BUY',
+                    'signal_type': '追涨型',
+                    'code': item.code,
+                    'name': item.name,
+                    'price': price,
+                    'change_pct': change_pct,
+                    'strength': strength,
+                    'position': position,
+                    'stop_loss': stop_loss,
+                    'reason': f'强势上涨{change_pct:.2f}%，板块龙头追涨信号',
+                    'priority': 'HIGH'
+                }
+                buy_signals.append(buy_signal)
+                print(f"  🚀🔴 {emoji} {item.name}({item.code}) {change_pct:+.2f}% {price:.2f} 【买入信号】")
+                
+            elif item.strategy_type == '低吸型' and -4 <= change_pct <= -1:
+                position = '25%'
+                stop_loss = price * 0.93  # 止损位-7%
+                
+                buy_signal = {
+                    'type': 'BUY',
+                    'signal_type': '低吸型',
+                    'code': item.code,
+                    'name': item.name,
+                    'price': price,
+                    'change_pct': change_pct,
+                    'strength': '中等',
+                    'position': position,
+                    'stop_loss': stop_loss,
+                    'reason': f'回调{change_pct:.2f}%，强势股低吸机会',
+                    'priority': 'MEDIUM'
+                }
+                buy_signals.append(buy_signal)
+                print(f"  💧🟡 {emoji} {item.name}({item.code}) {change_pct:+.2f}% {price:.2f} 【买入信号】")
+                
+            elif item.strategy_type == '抄底型' and -2 <= change_pct < 1:
+                position = '20%'
+                stop_loss = price * 0.92  # 止损位-8%
+                
+                buy_signal = {
+                    'type': 'BUY',
+                    'signal_type': '抄底型',
+                    'code': item.code,
+                    'name': item.name,
+                    'price': price,
+                    'change_pct': change_pct,
+                    'strength': '中等',
+                    'position': position,
+                    'stop_loss': stop_loss,
+                    'reason': f'跌幅收窄{change_pct:+.2f}%，止跌抄底信号',
+                    'priority': 'MEDIUM'
+                }
+                buy_signals.append(buy_signal)
+                print(f"  🎯🟡 {emoji} {item.name}({item.code}) {change_pct:+.2f}% {price:.2f} 【买入信号】")
+            
+            # 重要波动提醒（非买入信号）
+            elif abs(change_pct) >= 3:
                 alert_emoji = "🔥" if change_pct > 0 else "❄️"
                 print(f"  {alert_emoji} {emoji} {item.name}({item.code}) {change_pct:+.2f}% {price:.2f}")
                 alerts.append({
@@ -270,7 +337,7 @@ class IntegratedIntradayMonitor:
             else:
                 print(f"  {emoji} {item.name}({item.code}) {change_pct:+.2f}% {price:.2f}")
         
-        # 智能预警检查 - 新增功能
+        # 智能预警检查 - 止损提醒等
         print(f"\n🚨 智能预警检查:")
         alert_events = self.alert_system.check_alerts(codes)
         
@@ -289,8 +356,18 @@ class IntegratedIntradayMonitor:
         else:
             print(f"  ✅ 无预警触发")
         
-        print(f"\n提醒: {len(alerts)}个信号需要关注")
-        return alerts
+        # 汇总买入信号
+        if buy_signals:
+            print(f"\n🚨 买入信号汇总 ({len(buy_signals)}个):")
+            for sig in buy_signals:
+                emoji = "🔴" if sig['priority'] == 'HIGH' else "🟡"
+                print(f"  {emoji} {sig['signal_type']} | {sig['name']}({sig['code']}) {sig['change_pct']:+.2f}%")
+                print(f"     建议仓位: {sig['position']} | 止损位: {sig['stop_loss']:.2f}")
+        
+        print(f"\n提醒: {len(alerts)}个预警 | {len(buy_signals)}个买入信号")
+        
+        # 返回买入信号用于推送
+        return buy_signals + alerts
 
 
 def main():
@@ -335,27 +412,56 @@ def main():
 def send_alert_notifications(alerts):
     """发送预警通知到飞书"""
     try:
-        # 筛选出预警类型的alert
-        alert_events = [a for a in alerts if a.get('type') in ['大幅波动', 'price_break_up', 'price_break_down', 'volume_surge', 'drawdown']]
+        # 筛选买入信号和预警
+        buy_signals = [a for a in alerts if a.get('type') == 'BUY']
+        alert_events = [a for a in alerts if a.get('type') not in ['BUY', '大幅波动']]
         
-        if not alert_events:
-            return
+        messages = []
         
-        # 构建消息
-        lines = ["🚨 智能预警触发", ""]
+        # 买入信号 - 最高优先级
+        if buy_signals:
+            messages.append("🚨🚨🚨 买入信号触发 🚨🚨🚨")
+            messages.append("")
+            
+            for sig in buy_signals:
+                priority_emoji = "🔴" if sig.get('priority') == 'HIGH' else "🟡"
+                messages.append(f"{priority_emoji} 【{sig['signal_type']}】{sig['name']}({sig['code']})")
+                messages.append(f"   现价: {sig['price']:.2f}  涨幅: {sig['change_pct']:+.2f}%")
+                messages.append(f"   ✅ 建议仓位: {sig['position']}")
+                messages.append(f"   🛑 止损位: {sig['stop_loss']:.2f} (跌破立即止损)")
+                messages.append(f"   💡 理由: {sig['reason']}")
+                messages.append("")
         
-        for alert in alert_events[:5]:  # 最多显示5个
-            if alert.get('type') == '大幅波动':
-                emoji = "🔥" if alert.get('change_pct', 0) > 0 else "❄️"
-                lines.append(f"{emoji} {alert['name']}({alert['code']}) 波动 {alert['change_pct']:+.2f}%")
-            else:
-                lines.append(f"⚠️ {alert.get('message', alert.get('name', ''))}")
+        # 预警信号
+        if alert_events:
+            if messages:
+                messages.append("-" * 40)
+            messages.append("⚠️ 其他预警:")
+            for alert in alert_events[:3]:
+                messages.append(f"   {alert.get('message', '')}")
         
-        message = "\n".join(lines)
-        
-        # 这里可以接入飞书推送
-        # 由于是在脚本中，可以通过写入文件或调用message工具
-        print(f"\n[预警推送]\n{message}")
+        if messages:
+            message = "\n".join(messages)
+            print(f"\n[推送消息]\n{message}")
+            
+            # 实际推送到飞书
+            try:
+                import subprocess
+                result = subprocess.run([
+                    'python3', '-c',
+                    f'''
+import sys
+sys.path.insert(0, "/root/.openclaw/workspace/skills/a-share-quant-manager")
+from tools.message import send_feishu_message
+send_feishu_message("""{message}""")
+                    '''
+                ], capture_output=True, text=True)
+                if result.returncode == 0:
+                    print("✅ 消息已推送到飞书")
+                else:
+                    print(f"⚠️ 推送可能失败: {result.stderr}")
+            except Exception as e:
+                print(f"⚠️ 推送调用失败: {e}")
         
     except Exception as e:
         print(f"预警推送失败: {e}")

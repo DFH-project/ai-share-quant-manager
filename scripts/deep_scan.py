@@ -31,49 +31,82 @@ def get_portfolio_info():
     return {'codes': [], 'details': {}}
 
 def generate_scan_report(result, portfolio_info):
-    """生成带持仓标记的扫描报告 - 简洁版"""
+    """生成带持仓标记的扫描报告 - 详细版"""
     portfolio_codes = portfolio_info['codes']
     portfolio_details = portfolio_info['details']
     
     report_lines = []
-    report_lines.append("🔥 **A股深度扫描** | " + __import__('datetime').datetime.now().strftime('%H:%M'))
+    report_lines.append("=" * 60)
+    report_lines.append("🔥 A股深度扫描 | " + __import__('datetime').datetime.now().strftime('%H:%M'))
+    report_lines.append("=" * 60)
     report_lines.append("")
     
     # 板块表现
-    report_lines.append("📊 **板块表现**")
+    report_lines.append("📊 板块表现")
+    report_lines.append("-" * 60)
     sector = __import__('sys').modules['core.sector_tracker'].get_sector_tracker()
     sector_data = sector.calculate_sector_performance()
     for name, perf in sorted(sector_data.items(), key=lambda x: -x[1]['avg_change'])[:5]:
-        emoji = "🔥" if perf['avg_change'] > 2 else "📈"
+        emoji = "🔥" if perf['avg_change'] > 2 else ("📈" if perf['avg_change'] > 0 else "📉")
         up_count = perf.get('up_count', 0)
         total = perf.get('total', 0)
         report_lines.append(f"{emoji} {name}: {perf['avg_change']:+.2f}% ({up_count}/{total}上涨)")
+        # 显示板块龙头
+        if perf.get('leaders'):
+            for leader in perf['leaders'][:2]:
+                pos_marker = " [持仓]" if leader['code'] in portfolio_codes else ""
+                report_lines.append(f"   🏆 {leader['name']}({leader['code']}){pos_marker} {leader['change_pct']:+.2f}%")
     
     report_lines.append("")
     
-    # 五策略信号
-    report_lines.append("⭐ **五策略信号**")
-    strategy_summary = [
-        ('💧 低吸型', result.get('dip', {})),
-        ('🚀 追涨型', result.get('chase', {})),
-        ('💎 潜力型', result.get('potential', {})),
-        ('🎯 抄底型', result.get('bottom', {})),
-        ('⭐ 多维优选', result.get('multi', {})),
+    # 五策略信号详细展示
+    report_lines.append("✨ 五策略选股详细结果")
+    report_lines.append("=" * 60)
+    
+    strategy_configs = [
+        ('💧 强势股低吸型', 'dip', '昨日强势，今日回调'),
+        ('🚀 追涨型', 'chase', '板块龙头，强势突破'),
+        ('💎 潜力型', 'potential', '热门板块蓄势待发'),
+        ('🎯 抄底型', 'bottom', '调整后低位企稳'),
+        ('⭐ 多维度优选', 'multi', '综合评分≥65分'),
     ]
     
-    for name, data in strategy_summary:
+    for strategy_name, strategy_key, description in strategy_configs:
+        data = result.get(strategy_key, {})
         found = data.get('found', 0)
+        signals = data.get('signals', [])
+        
         if found > 0:
-            report_lines.append(f"{name}: {found}个信号")
-            for signal in data.get('signals', [])[:2]:
-                pos_marker = " [持仓]" if signal['code'] in portfolio_codes else ""
-                report_lines.append(f"  • {signal['name']}({signal['code']}){pos_marker} {signal.get('change_pct', 0):+.2f}%")
+            report_lines.append("")
+            report_lines.append(f"{strategy_name} - {found}只 ({description})")
+            report_lines.append("-" * 60)
+            
+            for i, signal in enumerate(signals[:5], 1):  # 显示前5只
+                pos_marker = " 📈[持仓]" if signal['code'] in portfolio_codes else ""
+                score_info = f" 评分:{signal.get('score', 'N/A')}分" if 'score' in signal else ""
+                
+                report_lines.append(f"{i}. {signal['name']}({signal['code']}){pos_marker}")
+                report_lines.append(f"   现价:{signal['price']:.2f}  涨幅:{signal.get('change_pct', 0):+.2f}%{score_info}")
+                
+                if 'suggestion' in signal:
+                    report_lines.append(f"   💡 {signal['suggestion']}")
+                
+                # 显示持仓盈亏
+                if signal['code'] in portfolio_codes:
+                    pos = portfolio_details[signal['code']]
+                    pnl = (signal['price'] - pos['cost_price']) / pos['cost_price'] * 100
+                    pnl_emoji = "🟢" if pnl >= 0 else "🔴"
+                    report_lines.append(f"   {pnl_emoji} 持仓成本:{pos['cost_price']:.2f} 盈亏:{pnl:+.2f}%")
+                report_lines.append("")
     
-    # 持仓股命中
-    report_lines.append("")
-    report_lines.append("📈 **持仓股监控**")
+    # 持仓股策略命中汇总
+    report_lines.append("=" * 60)
+    report_lines.append("📈 持仓股策略命中汇总")
+    report_lines.append("-" * 60)
+    
     hit_positions = []
-    for strategy_key in ['dip', 'chase', 'potential', 'bottom', 'multi']:
+    for strategy_key, strategy_name in [('dip', '低吸'), ('chase', '追涨'), ('potential', '潜力'), 
+                                        ('bottom', '抄底'), ('multi', '多维优选')]:
         signals = result.get(strategy_key, {}).get('signals', [])
         for signal in signals:
             if signal['code'] in portfolio_codes:
@@ -83,15 +116,23 @@ def generate_scan_report(result, portfolio_info):
                     'name': signal['name'],
                     'code': signal['code'],
                     'price': signal['price'],
-                    'pnl': pnl
+                    'cost': pos['cost_price'],
+                    'pnl': pnl,
+                    'strategy': strategy_name
                 })
     
     if hit_positions:
-        for hit in hit_positions[:3]:
-            emoji = "🟢" if hit['pnl'] >= 0 else "🔴"
-            report_lines.append(f"{emoji} {hit['name']}({hit['code']}) 现价:{hit['price']:.2f} 盈亏:{hit['pnl']:+.2f}%")
+        for hit in hit_positions:
+            pnl_emoji = "🟢" if hit['pnl'] >= 0 else "🔴"
+            report_lines.append(f"{pnl_emoji} {hit['name']}({hit['code']}) 命中【{hit['strategy']}】")
+            report_lines.append(f"   现价:{hit['price']:.2f} 成本:{hit['cost']:.2f} 盈亏:{hit['pnl']:+.2f}%")
     else:
         report_lines.append("暂无持仓股被策略选中")
+    
+    report_lines.append("")
+    report_lines.append("=" * 60)
+    report_lines.append("✅ 扫描完成")
+    report_lines.append("=" * 60)
     
     return "\n".join(report_lines)
     
