@@ -34,20 +34,26 @@ def monitor_sectors(sector_names):
         print(f"\n【{sector_name}】({len(stocks)}只成分股)")
         print("-" * 60)
         
+        # 批量获取数据（修复：传递列表而不是单个code）
+        all_data = data_fetcher.get_stock_data(stocks)
+        
         results = []
         for code in stocks:
             try:
-                data = data_fetcher.get_stock_data(code)
-                if data:
+                if code in all_data:
+                    data = all_data[code]
+                    # 修复：使用正确的字段名
                     results.append({
                         'code': code,
                         'name': data.get('name', code),
-                        'price': data.get('price', 0),
-                        'change': data.get('change_percent', 0),
+                        'price': data.get('current', 0),
+                        'change': data.get('change_pct', 0),
                         'volume': data.get('volume', 0)
                     })
-            except:
-                pass
+                else:
+                    print(f"  ⚠️ {code}: 无数据")
+            except Exception as e:
+                print(f"  ❌ {code}: 处理异常 - {e}")
         
         # 按涨幅排序
         results.sort(key=lambda x: x['change'], reverse=True)
@@ -61,12 +67,12 @@ def monitor_sectors(sector_names):
                 alert_messages.append(f"{r['name']}({r['code']}) 大涨{r['change']:+.2f}%")
             elif r['change'] > 3:
                 marker = '📈 活跃'
-            elif r['change'] < -3:
-                marker = '📉 调整'
             elif r['change'] < -5:
                 marker = '⚠️ 大跌'
                 has_alert = True
                 alert_messages.append(f"{r['name']}({r['code']}) 大跌{r['change']:+.2f}%")
+            elif r['change'] < -3:
+                marker = '📉 调整'
             
             name = r['name'][:6].ljust(8)
             print(f"  {r['code']} {name} {r['price']:8.2f} {r['change']:+6.2f}% {marker}")

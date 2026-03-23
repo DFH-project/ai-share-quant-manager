@@ -1,188 +1,129 @@
 #!/usr/bin/env python3
 """
-联动监控体系 - IntegratedMonitor
-整合：监控 + 自选管理 + 持仓分析
-核心设计：
-1. 数据只获取一次
-2. 并行分析
-3. 统一输出
+integrated_monitor.py - 整合监控入口
+整合：盘中监控 + 新闻监控
 """
 
 import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from core.data_manager import data_manager
-from core.parallel_analyzer import parallel_analyzer
-from core.watchlist_memory import get_watchlist_memory
-from typing import Dict, List
+from scripts.news_monitor import NewsMonitor
+from core.watchlist_memory_v2 import get_watchlist_memory_v2
+from core.data_fetcher import data_fetcher
 from datetime import datetime
 import json
-from pathlib import Path
 
 
-class IntegratedMonitor:
-    """联动监控器"""
+def run_integrated_monitoring():
+    """运行整合监控"""
+    print("\n" + "=" * 80)
+    print(f"🤖 A股智能监控系统 - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print("=" * 80)
     
-    def __init__(self):
-        self.data_manager = data_manager
-        self.analyzer = parallel_analyzer
-        self.watchlist = get_watchlist_memory()
-        
-    def load_portfolio(self) -> List[Dict]:
-        """加载持仓"""
-        try:
-            portfolio_path = Path(__file__).parent.parent / 'data' / 'portfolio.json'
-            if portfolio_path.exists():
-                with open(portfolio_path, 'r', encoding='utf-8') as f:
-                    portfolio = json.load(f)
-                    return portfolio.get('positions', [])
-        except Exception as e:
-            print(f"[持仓] 加载失败: {e}")
-        return []
+    # 1. 新闻监控（新增）
+    print("\n📰 第一步：新闻公告监控")
+    print("-" * 60)
+    news_monitor = NewsMonitor()
+    news_alerts = news_monitor.scan_all_stocks()
     
-    def run_monitor(self) -> Dict:
-        """
-        执行完整监控流程
-        
-        流程：
-        1. 获取大盘数据
-        2. 合并所有需要监控的股票（持仓+自选）
-        3. 并行获取数据（5只并发）
-        4. 并行分析
-        5. 生成报告
-        """
-        print(f"\n[{'='*70}]")
-        print(f"📊 联动监控启动 - {datetime.now().strftime('%H:%M:%S')}")
-        print(f"[{'='*70}]\n")
-        
-        # 1. 大盘
-        print("1️⃣ 获取大盘数据...")
-        market = self.data_manager.get_index_data()
-        sh = market.get('上证指数', {})
-        print(f"   上证指数: {sh.get('current', 0):.2f} ({sh.get('change_pct', 0):+.2f}%)\n")
-        
-        # 2. 合并监控列表
-        print("2️⃣ 合并监控列表...")
-        positions = self.load_portfolio()
-        watchlist_items = self.watchlist.get_all()
-        
-        position_codes = [p['code'] for p in positions]
-        watchlist_codes = [item.code for item in watchlist_items]
-        
-        # 去重合并
-        all_codes = list(set(position_codes + watchlist_codes))
-        print(f"   持仓: {len(position_codes)}只")
-        print(f"   自选: {len(watchlist_codes)}只")
-        print(f"   去重后: {len(all_codes)}只\n")
-        
-        # 3. 并行获取数据（核心优化点）
-        print("3️⃣ 并行获取数据（5只并发）...")
-        stock_data = self.data_manager.fetch_stock_data(all_codes)
-        print(f"   成功获取: {len(stock_data)}/{len(all_codes)}只\n")
-        
-        # 4. 并行分析（核心优化点）
-        print("4️⃣ 并行分析（5只并发）...")
-        analysis_results = self.analyzer.analyze_stocks(all_codes, stock_data)
-        print(f"   完成分析: {len(analysis_results)}只\n")
-        
-        # 5. 生成报告
-        print("5️⃣ 生成联动报告...\n")
-        report = self._generate_report(positions, watchlist_items, stock_data, analysis_results)
-        
-        return report
+    if news_alerts:
+        print(f"\n⚠️ 发现 {len(news_alerts)} 条重要新闻！")
+        high_priority = [a for a in news_alerts if a['priority'] == 'HIGH']
+        if high_priority:
+            print(f"🚨 其中 {len(high_priority)} 条高优先级，需要立即关注！")
+            for alert in high_priority[:3]:
+                print(f"\n   🔴 [{alert['name']}] {', '.join(alert['categories'])}")
+                print(f"      {alert['title'][:50]}...")
+    else:
+        print("✅ 最近24小时无重要公告")
     
-    def _generate_report(self, positions, watchlist_items, stock_data, analysis_results) -> Dict:
-        """生成统一报告"""
+    # 2. 价格监控
+    print("\n\n📈 第二步：价格异动监控")
+    print("-" * 60)
+    
+    price_alerts = []
+    watchlist = get_watchlist_memory_v2()
+    high_attention = watchlist.get_by_attention_level('特别关注')
+    
+    if not high_attention:
+        print("⚠️ 暂无特别关注股票（检查watchlist配置）")
+    else:
+        print(f"监控 {len(high_attention)} 只特别关注股...")
         
-        # 持仓监控
-        print("📈 持仓监控")
-        print("-" * 70)
-        position_alerts = []
-        for pos in positions:
-            code = pos['code']
-            if code in stock_data and code in analysis_results:
-                data = stock_data[code]
-                analysis = analysis_results[code]
-                
-                cost = pos['cost_price']
-                current = data['current']
-                pnl = (current - cost) / cost * 100
-                change = data['change_pct']
-                
-                emoji = "📉" if change < -3 else "🔴" if change < 0 else "🟢"
-                print(f"{emoji} {pos['name']}({code}): {current:.2f} ({change:+.2f}%) 盈亏:{pnl:+.1f}%")
-                
-                # 持仓健康度
-                health = analysis.total_score
-                if health < 40:
-                    print(f"   ⚠️ 健康度{health:.0f}分，建议关注")
-                    position_alerts.append({
-                        'code': code,
-                        'name': pos['name'],
-                        'action': '关注',
-                        'reason': f'健康度{health:.0f}分'
+        codes = [item.code for item in high_attention]
+        stock_data = data_fetcher.get_stock_data(codes)
+        
+        for item in high_attention:
+            if item.code not in stock_data:
+                continue
+            
+            data = stock_data[item.code]
+            change_pct = data.get('change_pct', 0)
+            current_price = data.get('current', 0)
+            
+            # 检查价格异动
+            if abs(change_pct) >= 5:
+                price_alerts.append({
+                    'code': item.code,
+                    'name': item.name,
+                    'change_pct': change_pct,
+                    'price': current_price,
+                    'reason': '大幅波动'
+                })
+                emoji = "📈" if change_pct > 0 else "📉"
+                print(f"{emoji} {item.name}({item.code}): {change_pct:+.2f}% ¥{current_price}")
+            
+            # 检查止损价
+            if item.entry_plan and item.entry_plan.stop_loss > 0:
+                if current_price <= item.entry_plan.stop_loss:
+                    price_alerts.append({
+                        'code': item.code,
+                        'name': item.name,
+                        'change_pct': change_pct,
+                        'price': current_price,
+                        'reason': f'跌破止损价¥{item.entry_plan.stop_loss}'
                     })
+                    print(f"🚨 {item.name}({item.code}): 跌破止损价！当前¥{current_price}")
         
-        # 策略选股
-        print(f"\n🎯 策略选股")
-        print("-" * 70)
-        
-        # 大跌反弹机会
-        dip_opportunities = []
-        for code, analysis in analysis_results.items():
-            if analysis.change_pct < -5 and analysis.total_score > 55:
-                dip_opportunities.append(analysis)
-        
-        if dip_opportunities:
-            print("💧 急跌反弹机会:")
-            for opp in sorted(dip_opportunities, key=lambda x: x.change_pct)[:5]:
-                print(f"   📉 {opp.name}({opp.code}): 跌{opp.change_pct:.1f}% 评分{opp.total_score:.0f}分")
-        
-        # 强势信号
-        strong_signals = []
-        for code, analysis in analysis_results.items():
-            if analysis.change_pct > 3 and analysis.total_score > 65:
-                strong_signals.append(analysis)
-        
-        if strong_signals:
-            print("\n🚀 强势信号:")
-            for sig in sorted(strong_signals, key=lambda x: x.change_pct, reverse=True)[:5]:
-                print(f"   📈 {sig.name}({sig.code}): 涨{sig.change_pct:.1f}% 评分{sig.total_score:.0f}分")
-        
-        # 高分标的
-        print("\n⭐ 多维度优选(评分>65):")
-        top_stocks = [a for a in analysis_results.values() if a.total_score >= 65]
-        top_stocks.sort(key=lambda x: x.total_score, reverse=True)
-        for s in top_stocks[:5]:
-            print(f"   ⭐ {s.name}({s.code}): {s.total_score:.0f}分 - {s.suggestion}")
-        
-        print(f"\n[{'='*70}]")
-        print("✅ 联动监控完成")
-        print(f"[{'='*70}]\n")
-        
-        return {
-            'timestamp': datetime.now().strftime('%H:%M:%S'),
-            'positions_count': len(positions),
-            'watchlist_count': len(watchlist_items),
-            'data_fetched': len(stock_data),
-            'analysis_done': len(analysis_results),
-            'dip_opportunities': len(dip_opportunities),
-            'strong_signals': len(strong_signals),
-            'top_stocks': len(top_stocks),
-        }
-
-
-def main():
-    """主函数"""
-    monitor = IntegratedMonitor()
-    report = monitor.run_monitor()
+        if not price_alerts:
+            print("✅ 价格无异常波动")
     
-    print("📊 监控统计:")
-    for key, value in report.items():
-        if key != 'timestamp':
-            print(f"   {key}: {value}")
+    # 3. 综合报告
+    print("\n" + "=" * 80)
+    print("📊 监控总结")
+    print("=" * 80)
+    
+    total_alerts = len(news_alerts) + len(price_alerts)
+    
+    if total_alerts == 0:
+        print("✅ 一切正常，无警报")
+        return 0
+    else:
+        print(f"⚠️ 共发现 {total_alerts} 个警报：")
+        print(f"   - 新闻公告: {len(news_alerts)} 条")
+        print(f"   - 价格异动: {len(price_alerts)} 条")
+        
+        # 生成详细报告
+        report = news_monitor.generate_alert_report(news_alerts)
+        print(report)
+        
+        # 建议行动
+        high_news = [a for a in news_alerts if a['priority'] == 'HIGH']
+        if high_news:
+            print("\n" + "=" * 80)
+            print("🎯 建议行动：")
+            print("=" * 80)
+            for alert in high_news:
+                if '减持' in alert['categories']:
+                    print(f"\n🔴 [{alert['name']}] 出现减持公告！")
+                    print(f"   建议：评估持仓，考虑减仓或止损")
+                if '监管' in alert['categories']:
+                    print(f"\n🔴 [{alert['name']}] 监管相关公告！")
+                    print(f"   建议：关注风险，谨慎操作")
+        
+        return 1  # 有警报
 
 
 if __name__ == '__main__':
-    main()
+    exit(run_integrated_monitoring())

@@ -239,6 +239,27 @@ class IntradayMonitorV2:
                     'action': '可考虑加仓'
                 })
         
+        elif strategy == '持仓监控型':
+            # 持仓监控型：大跌止损提醒，大涨目标提醒
+            if change_pct < -5:
+                alerts.append({
+                    'type': '🚨持仓大跌',
+                    'message': f'持仓股大跌 {change_pct:.2f}%，建议评估止损',
+                    'action': '立即检查基本面变化'
+                })
+            elif change_pct < -8:
+                alerts.append({
+                    'type': '❌强制止损',
+                    'message': f'跌幅超8%，触发强制止损线',
+                    'action': '立即止损离场'
+                })
+            elif change_pct > 5:
+                alerts.append({
+                    'type': '✅持仓盈利',
+                    'message': f'持仓股大涨 {change_pct:+.2f}%',
+                    'action': '可考虑减仓或持有'
+                })
+        
         return alerts
     
     def _check_entry_plan(self, item: WatchlistItemV2, current_price: float, change_pct: float) -> Optional[Dict]:
@@ -274,28 +295,57 @@ class IntradayMonitorV2:
         return None
     
     def _validate_selection_reason(self, item: WatchlistItemV2, data: Dict) -> Dict:
-        """验证选股原因是否仍然成立"""
+        """验证选股原因是否仍然成立 - 增强版"""
         result = {'valid': True, 'alert': False, 'issues': []}
         
         if not item.selection_reason:
             return result
         
         change_pct = data.get('change_pct', 0)
+        current_price = data.get('current', 0)
         
         # 检查失效条件
         invalidation_conditions = item.selection_reason.invalidation_conditions
         for condition in invalidation_conditions:
-            # 简单判断：如果包含"跌幅"等关键词
-            if '跌幅' in condition and change_pct < -5:
+            # 提取跌幅阈值（如"跌幅超过-8%"）
+            if '跌幅' in condition or '止损' in condition:
+                import re
+                # 匹配数字（支持负数）
+                numbers = re.findall(r'-?\d+', condition)
+                if numbers:
+                    threshold = float(numbers[0])
+                    if change_pct <= threshold:
+                        result['valid'] = False
+                        result['alert'] = True
+                        result['issues'].append(f'🚨触发失效条件: {condition} (当前{change_pct:.2f}%)')
+            
+            # 检查关键字触发
+            if '减持' in condition and '减持' in item.selection_reason.primary_reason:
+                result['issues'].append(f'⚠️注意: {condition}')
+                result['alert'] = True
+        
+        # 检查风险因素是否与当前情况匹配
+        risk_factors = item.selection_reason.risk_factors
+        for risk in risk_factors:
+            if '减持' in risk and change_pct < -5:
+                result['issues'].append(f'⚠️风险因素触发: {risk}')
+                result['alert'] = True
+            if '猴价' in risk and change_pct < -5:
+                result['issues'].append(f'⚠️风险因素触发: {risk}')
+                result['alert'] = True
+        
+        # 检查买入计划的止损价
+        if item.entry_plan and item.entry_plan.stop_loss > 0:
+            if current_price <= item.entry_plan.stop_loss:
                 result['valid'] = False
-                result['issues'].append(f'触发失效条件: {condition}')
+                result['alert'] = True
+                result['issues'].append(f'❌跌破设定止损价 {item.entry_plan.stop_loss:.2f}')
         
         # 大幅偏离预期
-        if '大跌' in item.selection_reason.expected_scenario and change_pct > 0:
-            result['issues'].append('预期大跌但实际上涨，逻辑可能变化')
-        
-        if result['issues']:
-            result['alert'] = True
+        if item.selection_reason.expected_scenario:
+            if '反弹' in item.selection_reason.expected_scenario and change_pct < -5:
+                result['issues'].append('⚠️预期反弹但大幅下跌，逻辑失效')
+                result['alert'] = True
         
         return result
     

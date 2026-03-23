@@ -45,7 +45,11 @@ class NightlyCacheUpdater:
             try:
                 with open(watchlist_file, 'r', encoding='utf-8') as f:
                     data = json.load(f)
-                    stocks.extend(data.get('stocks', []))
+                    # 支持两种格式：stocks数组 或 watchlist数组
+                    if 'stocks' in data:
+                        stocks.extend(data.get('stocks', []))
+                    elif 'watchlist' in data:
+                        stocks.extend([item.get('code') for item in data.get('watchlist', []) if item.get('code')])
             except Exception as e:
                 print(f"[警告] 加载watchlist失败: {e}")
         
