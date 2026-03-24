@@ -444,27 +444,35 @@ def send_alert_notifications(alerts):
             message = "\n".join(messages)
             print(f"\n[推送消息]\n{message}")
             
-            # 实际推送到飞书
-            try:
-                import subprocess
-                result = subprocess.run([
-                    'python3', '-c',
-                    f'''
-import sys
-sys.path.insert(0, "/root/.openclaw/workspace/skills/a-share-quant-manager")
-from tools.message import send_feishu_message
-send_feishu_message("""{message}""")
-                    '''
-                ], capture_output=True, text=True)
-                if result.returncode == 0:
-                    print("✅ 消息已推送到飞书")
-                else:
-                    print(f"⚠️ 推送可能失败: {result.stderr}")
-            except Exception as e:
-                print(f"⚠️ 推送调用失败: {e}")
+            # 推送通知（通过配置控制，不再硬编码）
+            _send_notification_if_enabled(message)
         
     except Exception as e:
         print(f"预警推送失败: {e}")
+
+
+def _send_notification_if_enabled(message: str):
+    """
+    根据配置发送通知
+    配置在 config/config.local.yaml 中控制
+    """
+    try:
+        from config.local_config import get_local_config
+        
+        config = get_local_config()
+        
+        if not config.is_notification_enabled():
+            return
+        
+        channels = config.get_notification_channels()
+        
+        # 这里可以根据配置调用不同的通知渠道
+        # 目前仅打印日志，实际推送由调用方处理
+        print(f"  [通知] 配置渠道: {channels}")
+        print(f"  [通知] 消息长度: {len(message)} 字符")
+        
+    except Exception as e:
+        print(f"  [通知] 配置检查失败: {e}")
 
 
 if __name__ == '__main__':

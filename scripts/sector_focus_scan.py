@@ -5,8 +5,12 @@
 监控华为算力、服务器等重点板块
 """
 import sys
+import os
 import argparse
-sys.path.insert(0, '/root/.openclaw/workspace/skills/a-share-quant-manager')
+# 动态添加项目路径
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_DIR = os.path.dirname(SCRIPT_DIR)
+sys.path.insert(0, PROJECT_DIR)
 
 from core.sector_tracker import get_sector_tracker
 from core.data_fetcher import data_fetcher

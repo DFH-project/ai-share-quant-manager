@@ -1,0 +1,43 @@
+# A股量化系统本地配置（隐私/环境相关）
+# 此文件包含敏感信息，不要提交到git！
+# 复制此模板为 config.local.yaml 并填写实际值
+
+# 用户配置
+user:
+  id: ""  # 用户ID
+  name: ""  # 用户名
+
+# 通知配置
+notifications:
+  enabled: false
+  channels: []  # feishu, telegram, email
+  feishu:
+    webhook: ""  # 飞书 webhook URL
+    user_id: ""  # 飞书用户ID
+  telegram:
+    bot_token: ""  # Telegram Bot Token
+    chat_id: ""  # Telegram Chat ID
+
+# 数据路径（可选，留空则使用默认）
+paths:
+  data_dir: ""  # 数据目录
+  cache_dir: ""  # 缓存目录
+  log_dir: ""  # 日志目录
+
+# API密钥（如有）
+api_keys:
+  tushare: ""  # Tushare API Key
+  akshare: ""  # AKShare 配置
+
+# 交易配置（隐私）
+trading:
+  initial_capital: 100000  # 初始资金
+  max_position_pct: 0.2  # 单股最大仓位
+  stop_loss_pct: 0.08  # 止损比例
+  take_profit_pct: 0.15  # 止盈比例
+
+# 监控配置
+monitor:
+  enabled: true
+  interval: 600  # 监控间隔（秒）
+  alert_threshold: 0.03  # 异动阈值

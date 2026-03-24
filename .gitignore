@@ -7,3 +7,10 @@ data/test_*.json
 data/cache/
 *.egg-info/
 .pytest_cache/
+
+# 本地配置文件（包含隐私信息）
+config/config.local.yaml
+config/*.local.yaml
+data/portfolio_*.json
+data/watchlist_*.json
+data/private/

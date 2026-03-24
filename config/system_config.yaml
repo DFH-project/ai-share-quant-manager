@@ -1,60 +1,76 @@
+# A股量化系统配置
+# 此文件可提交到git，不包含隐私信息
+# 隐私配置请使用 config.local.yaml
+
+# 数据配置
 data:
   cache_ttl_minutes: 5
   max_retry: 3
   timeout_seconds: 10
   sources:
-  - tencent
-  - eastmoney
-  - sina
-  - akshare
+    - tencent
+    - eastmoney
+    - sina
+    - akshare
+
+# 监控配置
 monitor:
-  high_frequency_interval: 10
-  medium_frequency_interval: 30
-  low_frequency_interval: 60
+  high_frequency_interval: 10  # 分钟
+  medium_frequency_interval: 30  # 分钟
+  low_frequency_interval: 60  # 分钟
   alert_cooldown_minutes: 30
-  price_change_threshold: 0.03
+  price_change_threshold: 0.03  # 3%
   volume_ratio_threshold: 3.0
-  drawdown_threshold: 0.08
+  drawdown_threshold: 0.08  # 8%
+
+# 风险控制配置（可被local配置覆盖）
 risk:
-  stop_loss_pct: -0.08
-  take_profit_pct: 0.15
-  max_position_pct: 0.25
-  max_drawdown_pct: 0.15
+  stop_loss_pct: -0.08  # -8%
+  take_profit_pct: 0.15  # +15%
+  max_position_pct: 0.25  # 单股最大25%
+  max_drawdown_pct: 0.15  # 组合最大回撤15%
   var_confidence: 0.95
+
+# 策略配置
 strategy:
   enabled_strategies:
-  - dip_buy
-  - momentum
-  - value
-  - multi_dimension
+    - dip_buy
+    - momentum
+    - value
+    - multi_dimension
   dip_buy_score_threshold: 50
   momentum_score_threshold: 60
   value_pe_threshold: 20.0
   value_roe_threshold: 15.0
+
+# 分析配置
 analysis:
-  trend_weight: 0.3
+  trend_weight: 0.30
   fundamental_weight: 0.25
-  fund_flow_weight: 0.2
+  fund_flow_weight: 0.20
   technical_weight: 0.15
-  sector_weight: 0.1
+  sector_weight: 0.10
   lookback_days: 60
+
+# 机器学习配置
 ml:
   enabled: true
   prediction_horizon: 5
   confidence_threshold: 0.6
   retrain_interval_days: 7
   features:
-  - price_change
-  - volume_ratio
-  - ma5
-  - ma20
-  - rsi
-  - macd
-  - volatility
+    - price_change
+    - volume_ratio
+    - ma5
+    - ma20
+    - rsi
+    - macd
+    - volatility
+
+# 系统配置
 system:
   debug: false
   log_level: INFO
   max_workers: 8
   data_dir: data
   cache_dir: data/cache
-updated_at: '2026-03-10T22:40:00'

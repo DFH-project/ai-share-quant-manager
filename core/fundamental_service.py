@@ -14,7 +14,10 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from core.data_fetcher import data_fetcher
 
-CACHE_DIR = '/root/.openclaw/workspace/skills/a-share-quant-manager/data/fundamental_cache'
+# 使用动态路径
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.dirname(SCRIPT_DIR)
+CACHE_DIR = os.path.join(BASE_DIR, 'data', 'fundamental_cache')
 CACHE_FILE = os.path.join(CACHE_DIR, 'fundamental_data.json')
 
 def ensure_cache_dir():
